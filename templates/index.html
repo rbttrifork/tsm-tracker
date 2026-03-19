@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TSM Price Tracker - Spineshatter</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3"></script>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <header>
+        <h1>TSM Price Tracker</h1>
+        <span class="realm">Spineshatter - Horde (EU-Fresh)</span>
+        <div class="header-actions">
+            {% if deployment_mode == 'local' %}
+            <button id="btn-collect" onclick="collectSnapshot()">Collect Snapshot</button>
+            {% endif %}
+            <span id="stats-info"></span>
+        </div>
+    </header>
+
+    <main>
+        <!-- Recommendations Panel -->
+        <section id="recommendations-panel">
+            <h2>Buy-Low Recommendations</h2>
+            <div id="recommendations-list"></div>
+        </section>
+
+        <!-- Category Tabs -->
+        <section id="items-section">
+            <div class="category-tabs">
+                <button class="tab active" data-category="all" onclick="filterCategory('all')">All</button>
+                {% for cat_id, cat_name in categories %}
+                <button class="tab" data-category="{{ cat_id }}" onclick="filterCategory('{{ cat_id }}')">{{ cat_name }}</button>
+                {% endfor %}
+            </div>
+
+            <!-- Item Grid -->
+            <div id="item-grid"></div>
+        </section>
+
+        <!-- Price Chart Modal -->
+        <div id="chart-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="chart-title">Item Price History</h2>
+                    <div class="chart-controls">
+                        <select id="chart-days" onchange="reloadChart()">
+                            <option value="7">7 days</option>
+                            <option value="14">14 days</option>
+                            <option value="30" selected>30 days</option>
+                            <option value="60">60 days</option>
+                        </select>
+                        <button class="close-btn" onclick="closeChart()">&times;</button>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="price-chart"></canvas>
+                </div>
+                <div id="dow-chart-container">
+                    <h3>Average Price by Day of Week</h3>
+                    <canvas id="dow-chart"></canvas>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="/static/app.js"></script>
+    <script>
+        // Pass raid days from server config
+        window.RAID_DAYS = {{ raid_days | tojson }};
+    </script>
+</body>
+</html>
