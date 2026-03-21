@@ -168,10 +168,10 @@ def get_day_of_week_averages(item_id, days=14):
     rows = conn.execute(
         """SELECT
              CAST(strftime('%w', snapshot_time, 'unixepoch') AS INTEGER) as dow,
-             AVG(COALESCE(market_value, min_buyout)) as avg_price,
+             AVG(min_buyout) as avg_price,
              COUNT(*) as cnt
            FROM price_snapshots
-           WHERE item_id = ? AND snapshot_time >= ? AND COALESCE(market_value, min_buyout) IS NOT NULL AND COALESCE(market_value, min_buyout) > 0
+           WHERE item_id = ? AND snapshot_time >= ? AND min_buyout IS NOT NULL AND min_buyout > 0
            GROUP BY dow""",
         (item_id, cutoff),
     ).fetchall()
