@@ -64,19 +64,19 @@ TBC_ITEMS = {
 
     # Elixirs - Battle
     22831: ("Elixir of Major Agility", "elixir", "inv_potion_127"),
-    22840: ("Elixir of Major Shadow Power", "elixir", "inv_potion_151"),
-    22827: ("Elixir of Major Strength", "elixir", "inv_potion_148"),
+    22835: ("Elixir of Major Shadow Power", "elixir", "inv_potion_145"),
+    22824: ("Elixir of Major Strength", "elixir", "inv_potion_147"),
     22833: ("Elixir of Major Firepower", "elixir", "inv_potion_146"),
-    22835: ("Elixir of Major Frost Power", "elixir", "inv_potion_145"),
+    22827: ("Elixir of Major Frost Power", "elixir", "inv_potion_148"),
     28103: ("Adept's Elixir", "elixir", "inv_potion_96"),
 
     # Elixirs - Guardian
-    22848: ("Elixir of Major Defense", "elixir", "inv_potion_136"),
-    22847: ("Elixir of Major Fortitude", "elixir", "inv_potion_125"),
+    22834: ("Elixir of Major Defense", "elixir", "inv_potion_122"),
+    32062: ("Elixir of Major Fortitude", "elixir", "inv_potion_158"),
     32067: ("Elixir of Draenic Wisdom", "elixir", "inv_potion_155"),
     32068: ("Elixir of Ironskin", "elixir", "inv_potion_159"),
-    22834: ("Elixir of Major Mageblood", "elixir", "inv_potion_122"),
-    22851: ("Elixir of the Searching Eye", "elixir", "inv_potion_119"),
+    22840: ("Elixir of Major Mageblood", "elixir", "inv_potion_151"),
+    22830: ("Elixir of the Searching Eye", "elixir", "inv_potion_135"),
 
     # Potions
     22832: ("Super Mana Potion", "potion", "inv_potion_137"),

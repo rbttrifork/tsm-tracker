@@ -65,7 +65,7 @@ def init_db():
 
 
 def populate_items(tbc_items):
-    """Insert/update the items table from the TBC_ITEMS config dict."""
+    """Insert/update the items table from the TBC_ITEMS config dict. Removes stale entries."""
     conn = get_db()
     for item_id, item_data in tbc_items.items():
         name, category = item_data[0], item_data[1]
@@ -73,6 +73,12 @@ def populate_items(tbc_items):
             "INSERT OR REPLACE INTO items (item_id, name, category) VALUES (?, ?, ?)",
             (item_id, name, category),
         )
+    # Remove items no longer in config
+    placeholders = ",".join("?" * len(tbc_items))
+    conn.execute(
+        f"DELETE FROM items WHERE item_id NOT IN ({placeholders})",
+        list(tbc_items.keys()),
+    )
     conn.commit()
     conn.close()
 

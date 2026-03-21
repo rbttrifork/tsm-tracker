@@ -32,21 +32,11 @@ async function loadStats() {
     const res = await fetch("/api/stats");
     const stats = await res.json();
     const el = document.getElementById("stats-info");
-    if (stats.total_snapshots > 0 || stats.total_trades > 0) {
-        let parts = [];
-        if (stats.total_snapshots > 0) {
-            parts.push(`${stats.total_snapshots.toLocaleString()} snapshots`);
-        }
-        if (stats.total_trades > 0) {
-            parts.push(`${stats.total_trades.toLocaleString()} trades`);
-        }
-        parts.push(`${stats.tracked_items} items`);
-        if (stats.earliest_trade) {
-            const earliest = new Date(stats.earliest_trade * 1000).toLocaleDateString();
-            const latest = new Date((stats.latest_trade || stats.latest_snapshot) * 1000).toLocaleDateString();
-            parts.push(`${earliest} - ${latest}`);
-        }
-        el.textContent = parts.join(" | ");
+    if (stats.latest_snapshot) {
+        const d = new Date(stats.latest_snapshot * 1000);
+        const date = d.toLocaleDateString();
+        const time = d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+        el.textContent = `Last updated: ${date} ${time}`;
     } else {
         el.textContent = "No data yet. Import backups or collect a snapshot.";
     }
