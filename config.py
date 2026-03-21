@@ -163,8 +163,8 @@ TBC_ITEMS = {
     21845: ("Primal Mooncloth", "cloth", "inv_fabric_moonrag_primal"),
     21844: ("Bolt of Soulcloth", "cloth", "inv_fabric_soulcloth_bolt"),
     21840: ("Bolt of Netherweave", "cloth", "inv_fabric_netherweave_bolt"),
-    25707: ("Knothide Leather", "leather", "inv_misc_leatherscrap_13"),
-    25708: ("Thick Knothide Leather", "leather", "inv_misc_leatherscrap_14"),
+    21887: ("Knothide Leather", "leather", "inv_misc_leatherscrap_10"),
+    23793: ("Heavy Knothide Leather", "leather", "inv_misc_leatherscrap_11"),
     29548: ("Nether Dragonscales", "leather", "inv_misc_monsterscales_10"),
 
     # Misc Crafting
