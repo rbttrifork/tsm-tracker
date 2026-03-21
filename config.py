@@ -4,7 +4,7 @@ import os
 
 # --- Paths ---
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(BASE_DIR, "tsm_tracker.db")
+DB_PATH = os.environ.get("DB_PATH", os.path.join(BASE_DIR, "tsm_tracker.db"))
 
 APPDATA_LUA_PATH = r"D:\Games\World of Warcraft\_anniversary_\Interface\AddOns\TradeSkillMaster_AppHelper\AppData.lua"
 BACKUP_DIR = r"C:\Users\Bruger\AppData\Roaming\TradeSkillMaster\TSMApplication\Backups"
