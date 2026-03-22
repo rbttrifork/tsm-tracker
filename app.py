@@ -6,7 +6,7 @@ from flask import Flask, render_template, jsonify, request
 from db import init_db, get_db, populate_items, insert_price_snapshots_bulk, insert_trades_bulk
 from config import TBC_ITEMS, CATEGORIES, RAID_DAYS, DEPLOYMENT_MODE, PUSH_API_KEY
 from tsm_parser import copper_to_gold_float
-from analyzer import get_recommendations, get_day_of_week_averages
+from analyzer import get_recommendations, get_sell_recommendations, get_day_of_week_averages
 
 # Only import collector in local mode (it needs AppData.lua access)
 if DEPLOYMENT_MODE == "local":
@@ -150,6 +150,19 @@ def api_recommendations():
         r["current_min_buyout_gold"] = copper_to_gold_float(r["current_min_buyout"])
         r["avg_7d_gold"] = copper_to_gold_float(r["avg_7d"])
         r["avg_14d_gold"] = copper_to_gold_float(r["avg_14d"])
+        r["avg_raid_day_gold"] = copper_to_gold_float(r["avg_raid_day_price"])
+        r["avg_off_day_gold"] = copper_to_gold_float(r["avg_off_day_price"])
+        r["icon_url"] = get_icon_url(r["item_id"])
+    return jsonify(recs)
+
+
+@app.route("/api/sell-recommendations")
+def api_sell_recommendations():
+    """Get sell-high recommendations."""
+    recs = get_sell_recommendations()
+    for r in recs:
+        r["current_min_buyout_gold"] = copper_to_gold_float(r["current_min_buyout"])
+        r["avg_7d_gold"] = copper_to_gold_float(r["avg_7d"])
         r["avg_raid_day_gold"] = copper_to_gold_float(r["avg_raid_day_price"])
         r["avg_off_day_gold"] = copper_to_gold_float(r["avg_off_day_price"])
         r["icon_url"] = get_icon_url(r["item_id"])

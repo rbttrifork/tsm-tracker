@@ -159,6 +159,51 @@ main {
 .rec-details .profit { color: var(--green); }
 .rec-details .discount { color: var(--orange); }
 
+/* Sell High Recommendations */
+#sell-recommendations-panel {
+    margin-bottom: 2rem;
+}
+
+#sell-recommendations-panel h2 {
+    color: var(--green);
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+}
+
+#sell-recommendations-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 0.75rem;
+}
+
+.sell-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.1s;
+}
+
+.sell-card:hover {
+    border-color: var(--green);
+    transform: translateY(-1px);
+}
+
+.sell-card.strong_sell { border-left: 4px solid var(--gold); }
+.sell-card.sell { border-left: 4px solid var(--green); }
+
+.sell-signal {
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.15rem 0.5rem;
+    border-radius: 3px;
+    text-transform: uppercase;
+}
+
+.sell-signal.strong_sell { background: #614a00; color: var(--gold); }
+.sell-signal.sell { background: #166534; color: var(--green); }
+
 /* Category Tabs */
 .category-tabs {
     display: flex;

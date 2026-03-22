@@ -11,6 +11,7 @@ let dowChart = null;
 document.addEventListener("DOMContentLoaded", () => {
     loadItems();
     loadRecommendations();
+    loadSellRecommendations();
     loadStats();
 });
 
@@ -26,6 +27,12 @@ async function loadRecommendations() {
     const res = await fetch("/api/recommendations");
     const recs = await res.json();
     renderRecommendations(recs);
+}
+
+async function loadSellRecommendations() {
+    const res = await fetch("/api/sell-recommendations");
+    const recs = await res.json();
+    renderSellRecommendations(recs);
 }
 
 async function loadStats() {
@@ -118,6 +125,32 @@ function renderRecommendations(recs) {
                 <span>Exp. Profit: <span class="profit">+${(r.expected_profit_pct * 100).toFixed(1)}%</span></span>
                 <span>Raid Day Avg: <span class="value">${formatGold(r.avg_raid_day_gold)}</span></span>
                 <span>Confidence: <span class="value">${(r.confidence * 100).toFixed(0)}%</span></span>
+            </div>
+        </div>
+    `).join("");
+}
+
+function renderSellRecommendations(recs) {
+    const container = document.getElementById("sell-recommendations-list");
+    const sellRecs = recs.filter(r => r.signal === "strong_sell" || r.signal === "sell");
+
+    if (sellRecs.length === 0) {
+        container.innerHTML = '<div style="color: var(--text-dim); padding: 1rem;">No sell-high opportunities detected right now. Prices are near or below average.</div>';
+        return;
+    }
+
+    container.innerHTML = sellRecs.map(r => `
+        <div class="sell-card ${r.signal}" onclick="openChart(${r.item_id})">
+            <div class="rec-header">
+                ${r.icon_url ? `<img class="rec-icon" src="${r.icon_url}" alt="" loading="lazy" onerror="this.style.display='none'">` : ''}
+                <span class="rec-name">${r.name}</span>
+                <span class="sell-signal ${r.signal}">${r.signal.replace("_", " ")}</span>
+            </div>
+            <div class="rec-details">
+                <span>Current: <span class="gold-value">${formatGold(r.current_min_buyout_gold)}</span></span>
+                <span>7d Avg: <span class="value">${formatGold(r.avg_7d_gold)}</span></span>
+                <span>Premium: <span class="profit">+${(r.premium_pct * 100).toFixed(1)}%</span></span>
+                <span>Raid Day Avg: <span class="value">${formatGold(r.avg_raid_day_gold)}</span></span>
             </div>
         </div>
     `).join("");

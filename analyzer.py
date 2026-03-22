@@ -157,6 +157,107 @@ def get_recommendations():
     return recommendations
 
 
+def get_sell_recommendations():
+    """Analyze prices and return sell-high recommendations.
+
+    Returns items whose current min buyout is above their rolling average,
+    indicating a good time to post on the AH.
+    """
+    conn = get_db()
+    now = int(time.time())
+    seven_days_ago = now - 7 * 86400
+    fourteen_days_ago = now - 14 * 86400
+
+    items = conn.execute("SELECT item_id, name, category FROM items").fetchall()
+    recommendations = []
+
+    sqlite_raid_days = [((d + 1) % 7) for d in RAID_DAYS]
+    raid_day_str = ",".join(str(d) for d in sqlite_raid_days)
+
+    for item in items:
+        item_id = item["item_id"]
+
+        latest = conn.execute(
+            """SELECT min_buyout, market_value, num_auctions, snapshot_time
+               FROM price_snapshots
+               WHERE item_id = ? AND min_buyout IS NOT NULL AND min_buyout > 0
+               ORDER BY snapshot_time DESC LIMIT 1""",
+            (item_id,),
+        ).fetchone()
+
+        if not latest:
+            continue
+
+        current_price = latest["min_buyout"]
+        current_auctions = latest["num_auctions"] or 0
+
+        # 7-day average
+        avg_7d_row = conn.execute(
+            """SELECT AVG(min_buyout) as avg_price, COUNT(*) as cnt
+               FROM price_snapshots
+               WHERE item_id = ? AND snapshot_time >= ? AND min_buyout IS NOT NULL AND min_buyout > 0""",
+            (item_id, seven_days_ago),
+        ).fetchone()
+
+        if not avg_7d_row or not avg_7d_row["avg_price"] or avg_7d_row["cnt"] < 3:
+            continue
+
+        avg_7d = avg_7d_row["avg_price"]
+
+        # Raid day vs off day averages
+        raid_avg_row = conn.execute(
+            f"""SELECT AVG(min_buyout) as avg_price, COUNT(*) as cnt
+               FROM price_snapshots
+               WHERE item_id = ? AND snapshot_time >= ?
+                 AND min_buyout IS NOT NULL AND min_buyout > 0
+                 AND CAST(strftime('%w', snapshot_time, 'unixepoch') AS INTEGER) IN ({raid_day_str})""",
+            (item_id, fourteen_days_ago),
+        ).fetchone()
+
+        off_avg_row = conn.execute(
+            f"""SELECT AVG(min_buyout) as avg_price, COUNT(*) as cnt
+               FROM price_snapshots
+               WHERE item_id = ? AND snapshot_time >= ?
+                 AND min_buyout IS NOT NULL AND min_buyout > 0
+                 AND CAST(strftime('%w', snapshot_time, 'unixepoch') AS INTEGER) NOT IN ({raid_day_str})""",
+            (item_id, fourteen_days_ago),
+        ).fetchone()
+
+        avg_raid_day = raid_avg_row["avg_price"] if raid_avg_row and raid_avg_row["avg_price"] else avg_7d
+        avg_off_day = off_avg_row["avg_price"] if off_avg_row and off_avg_row["avg_price"] else avg_7d
+
+        # Premium above 7-day average
+        premium_pct = (current_price - avg_7d) / avg_7d if avg_7d > 0 else 0
+
+        # Determine signal
+        if premium_pct >= 0.15:
+            signal = "strong_sell"
+        elif premium_pct >= 0.05:
+            signal = "sell"
+        else:
+            signal = "hold"
+
+        recommendations.append({
+            "item_id": item_id,
+            "name": item["name"],
+            "category": item["category"],
+            "current_min_buyout": current_price,
+            "avg_7d": avg_7d,
+            "avg_raid_day_price": avg_raid_day,
+            "avg_off_day_price": avg_off_day,
+            "premium_pct": premium_pct,
+            "signal": signal,
+            "num_auctions": current_auctions,
+        })
+
+    conn.close()
+
+    signal_order = {"strong_sell": 0, "sell": 1, "hold": 2}
+    recommendations.sort(key=lambda r: (signal_order.get(r["signal"], 3), -r["premium_pct"]))
+
+    return recommendations
+
+
 def get_day_of_week_averages(item_id, days=14):
     """Get average prices by day of week for an item.
 
