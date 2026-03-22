@@ -1,4 +1,4 @@
-/* TSM Price Tracker - Dark WoW-inspired theme */
+/* TSM Price Tracker - AH Command Center */
 
 :root {
     --bg-dark: #1a1a2e;
@@ -25,28 +25,35 @@ body {
     min-height: 100vh;
 }
 
+/* Header */
 header {
     background: var(--bg-card);
     border-bottom: 2px solid var(--border);
-    padding: 1rem 2rem;
+    padding: 0.75rem 1.5rem;
     display: flex;
     align-items: center;
-    gap: 1.5rem;
+    justify-content: space-between;
     flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 }
 
 header h1 {
     color: var(--gold);
-    font-size: 1.5rem;
+    font-size: 1.3rem;
 }
 
 .realm {
     color: var(--text-dim);
-    font-size: 0.9rem;
+    font-size: 0.85rem;
 }
 
-.header-actions {
-    margin-left: auto;
+.header-right {
     display: flex;
     align-items: center;
     gap: 1rem;
@@ -54,17 +61,17 @@ header h1 {
 
 #stats-info {
     color: var(--text-dim);
-    font-size: 0.85rem;
+    font-size: 0.8rem;
 }
 
 button {
     background: var(--border);
     color: var(--text);
     border: 1px solid var(--border);
-    padding: 0.5rem 1rem;
+    padding: 0.4rem 0.8rem;
     border-radius: 4px;
     cursor: pointer;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     transition: background 0.2s;
 }
 
@@ -72,149 +79,319 @@ button:hover {
     background: #1a4080;
 }
 
+/* Market Pulse Bar */
+.market-pulse {
+    background: linear-gradient(135deg, #16213e 0%, #1a1a2e 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 0.6rem 1.5rem;
+}
+
+.pulse-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.pulse-label {
+    font-weight: 700;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-dim);
+    flex-shrink: 0;
+}
+
+.pulse-stats {
+    display: flex;
+    gap: 1.25rem;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+}
+
+.pulse-above { color: var(--green); }
+.pulse-normal { color: var(--text-dim); }
+.pulse-below { color: var(--orange); }
+.pulse-arrow { font-size: 0.65rem; }
+.pulse-arrow.up { color: var(--green); }
+.pulse-arrow.down { color: var(--orange); }
+
+.pulse-bar {
+    flex: 1;
+    height: 6px;
+    border-radius: 3px;
+    display: flex;
+    overflow: hidden;
+    background: rgba(255,255,255,0.05);
+}
+
+.pulse-segment {
+    height: 100%;
+    transition: width 0.5s ease;
+}
+
+.pulse-segment.above { background: var(--green); }
+.pulse-segment.normal { background: var(--text-dim); opacity: 0.3; }
+.pulse-segment.below { background: var(--orange); }
+
+/* Main Layout */
 main {
     max-width: 1400px;
     margin: 0 auto;
-    padding: 1.5rem;
+    padding: 1.25rem;
 }
 
-/* Recommendations */
-#recommendations-panel {
-    margin-bottom: 2rem;
+/* Section Titles */
+.section-title {
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
-#recommendations-panel h2 {
-    color: var(--gold);
-    margin-bottom: 1rem;
-    font-size: 1.2rem;
+.buy-title { color: var(--blue); }
+.sell-title { color: var(--green); }
+.movers-title { color: var(--purple); }
+.items-title { color: var(--text-dim); }
+
+.section-count {
+    font-size: 0.8rem;
+    font-weight: 400;
+    color: var(--text-dim);
 }
 
-#recommendations-list {
+.collapsible {
+    cursor: pointer;
+    user-select: none;
+}
+
+.collapsible:hover {
+    color: var(--text);
+}
+
+.no-data {
+    color: var(--text-dim);
+    padding: 0.75rem;
+    font-size: 0.85rem;
+}
+
+/* Side-by-Side Recommendations */
+.recommendations-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 0.75rem;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+    margin-bottom: 1.5rem;
 }
 
-.rec-card {
+.rec-panel {
+    min-width: 0;
+}
+
+/* Compact Recommendation Cards */
+.compact-card {
     background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: 6px;
-    padding: 0.75rem 1rem;
+    padding: 0.6rem 0.75rem;
     cursor: pointer;
     transition: border-color 0.2s, transform 0.1s;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.5rem;
 }
 
-.rec-card:hover {
-    border-color: var(--gold);
+.compact-card:hover {
     transform: translateY(-1px);
 }
 
-.rec-card.strong_buy { border-left: 4px solid var(--green); }
-.rec-card.buy { border-left: 4px solid var(--blue); }
-.rec-card.hold { border-left: 4px solid var(--text-dim); }
+.compact-card.buy:hover { border-color: var(--blue); }
+.compact-card.sell:hover { border-color: var(--green); }
 
-.rec-icon {
-    width: 24px;
-    height: 24px;
+.compact-card.strong_buy { border-left: 3px solid var(--green); }
+.compact-card.buy { border-left: 3px solid var(--blue); }
+.compact-card.strong_sell { border-left: 3px solid var(--gold); }
+.compact-card.sell { border-left: 3px solid var(--green); }
+
+.card-icon {
+    width: 32px;
+    height: 32px;
     border-radius: 3px;
     border: 1px solid var(--border);
     flex-shrink: 0;
 }
 
-.rec-header {
+.card-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.card-top {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.4rem;
     gap: 0.4rem;
+    margin-bottom: 0.2rem;
 }
 
-.rec-name {
+.card-name {
     font-weight: 600;
-    font-size: 0.95rem;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.rec-signal {
-    font-size: 0.75rem;
+.signal-badge {
+    font-size: 0.6rem;
     font-weight: 700;
-    padding: 0.15rem 0.5rem;
+    padding: 0.1rem 0.4rem;
     border-radius: 3px;
     text-transform: uppercase;
+    flex-shrink: 0;
+    white-space: nowrap;
 }
 
-.rec-signal.strong_buy { background: #166534; color: var(--green); }
-.rec-signal.buy { background: #1e3a5f; color: var(--blue); }
-.rec-signal.hold { background: #333; color: var(--text-dim); }
+.signal-badge.strong_buy { background: #166534; color: var(--green); }
+.signal-badge.buy { background: #1e3a5f; color: var(--blue); }
+.signal-badge.strong_sell { background: #614a00; color: var(--gold); }
+.signal-badge.sell { background: #166534; color: var(--green); }
 
-.rec-details {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.25rem;
-    font-size: 0.8rem;
+.card-prices {
+    display: flex;
+    gap: 0.75rem;
+    font-size: 0.75rem;
+    margin-bottom: 0.25rem;
+}
+
+.card-current {
+    color: var(--gold);
+    font-weight: 600;
+}
+
+.card-avg {
     color: var(--text-dim);
 }
 
-.rec-details .value { color: var(--text); }
-.rec-details .gold-value { color: var(--gold); }
-.rec-details .profit { color: var(--green); }
-.rec-details .discount { color: var(--orange); }
-
-/* Sell High Recommendations */
-#sell-recommendations-panel {
-    margin-bottom: 2rem;
+.card-bar-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
-#sell-recommendations-panel h2 {
-    color: var(--green);
-    margin-bottom: 1rem;
-    font-size: 1.2rem;
+.card-bar-wrap .card-bar {
+    height: 3px;
+    border-radius: 2px;
+    transition: width 0.3s ease;
 }
 
-#sell-recommendations-list {
+.buy-bar { background: linear-gradient(90deg, var(--blue), var(--green)); }
+.sell-bar { background: linear-gradient(90deg, var(--green), var(--gold)); }
+
+.card-pct {
+    font-size: 0.7rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.compact-card.buy .card-pct { color: var(--orange); }
+.compact-card.sell .card-pct { color: var(--green); }
+
+.more-cards.hidden { display: none; }
+
+.show-more-btn {
+    width: 100%;
+    background: transparent;
+    border: 1px dashed var(--border);
+    color: var(--text-dim);
+    padding: 0.4rem;
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    border-radius: 4px;
+}
+
+.show-more-btn:hover {
+    color: var(--text);
+    border-color: var(--text-dim);
+    background: rgba(255,255,255,0.03);
+}
+
+/* Market Movers */
+.market-movers {
+    margin-bottom: 1.5rem;
+}
+
+.movers-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 0.75rem;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 0.5rem;
 }
 
-.sell-card {
+.mover-card {
     background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: 6px;
-    padding: 0.75rem 1rem;
+    padding: 0.5rem 0.65rem;
     cursor: pointer;
-    transition: border-color 0.2s, transform 0.1s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: border-color 0.2s;
 }
 
-.sell-card:hover {
-    border-color: var(--green);
-    transform: translateY(-1px);
+.mover-card:hover { border-color: var(--purple); }
+
+.mover-card.gainer { border-left: 3px solid var(--green); }
+.mover-card.loser { border-left: 3px solid var(--red); }
+
+.mover-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 2px;
+    flex-shrink: 0;
 }
 
-.sell-card.strong_sell { border-left: 4px solid var(--gold); }
-.sell-card.sell { border-left: 4px solid var(--green); }
+.mover-info {
+    flex: 1;
+    min-width: 0;
+}
 
-.sell-signal {
+.mover-name {
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mover-price {
+    font-size: 0.7rem;
+    color: var(--gold);
+}
+
+.mover-change {
     font-size: 0.75rem;
     font-weight: 700;
-    padding: 0.15rem 0.5rem;
-    border-radius: 3px;
-    text-transform: uppercase;
+    flex-shrink: 0;
 }
 
-.sell-signal.strong_sell { background: #614a00; color: var(--gold); }
-.sell-signal.sell { background: #166534; color: var(--green); }
+.mover-change.up { color: var(--green); }
+.mover-change.down { color: var(--red); }
 
 /* Category Tabs */
 .category-tabs {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
+    gap: 0.4rem;
+    margin-bottom: 0.75rem;
 }
 
 .tab {
-    padding: 0.4rem 0.8rem;
-    font-size: 0.8rem;
+    padding: 0.35rem 0.7rem;
+    font-size: 0.75rem;
     border-radius: 20px;
 }
 
@@ -226,26 +403,26 @@ main {
 /* Item Grid */
 #item-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 0.75rem;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 0.6rem;
 }
 
 .item-card {
     background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: 6px;
-    padding: 0.75rem;
+    padding: 0.6rem;
     cursor: pointer;
     transition: border-color 0.2s;
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.6rem;
 }
 
 .item-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 4px;
+    width: 36px;
+    height: 36px;
+    border-radius: 3px;
     border: 1px solid var(--border);
     flex-shrink: 0;
 }
@@ -261,34 +438,28 @@ main {
 
 .item-card .item-name {
     font-weight: 600;
-    font-size: 0.9rem;
-    margin-bottom: 0.3rem;
+    font-size: 0.8rem;
+    margin-bottom: 0.2rem;
 }
 
 .item-card .item-category {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     color: var(--text-dim);
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    margin-bottom: 0.4rem;
+    margin-bottom: 0.3rem;
 }
 
 .item-card .item-price {
     color: var(--gold);
-    font-size: 1.1rem;
+    font-size: 0.95rem;
     font-weight: 700;
 }
 
 .item-card .item-price small {
     font-weight: 400;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     color: var(--text-dim);
-}
-
-.item-card .item-auctions {
-    font-size: 0.75rem;
-    color: var(--text-dim);
-    margin-top: 0.2rem;
 }
 
 /* Chart Modal */
@@ -384,9 +555,14 @@ main {
 
 /* Responsive */
 @media (max-width: 768px) {
-    header { padding: 0.75rem 1rem; }
-    main { padding: 1rem; }
+    header { padding: 0.5rem 0.75rem; }
+    header h1 { font-size: 1.1rem; }
+    .pulse-content { flex-wrap: wrap; gap: 0.5rem; }
+    .pulse-bar { width: 100%; flex: none; }
+    main { padding: 0.75rem; }
+    .recommendations-grid { grid-template-columns: 1fr; }
+    .movers-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
     .modal-content { width: 95%; padding: 1rem; }
     .chart-container { height: 300px; }
-    #recommendations-list { grid-template-columns: 1fr; }
+    #item-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
 }

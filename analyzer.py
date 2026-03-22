@@ -258,6 +258,111 @@ def get_sell_recommendations():
     return recommendations
 
 
+def get_market_summary():
+    """Get overall market health summary.
+
+    Returns counts of items above/below/at their 7-day average.
+    """
+    conn = get_db()
+    now = int(time.time())
+    seven_days_ago = now - 7 * 86400
+
+    items = conn.execute("SELECT item_id, name FROM items").fetchall()
+    above = 0
+    below = 0
+    normal = 0
+    total = 0
+
+    for item in items:
+        item_id = item["item_id"]
+
+        latest = conn.execute(
+            """SELECT min_buyout FROM price_snapshots
+               WHERE item_id = ? AND min_buyout IS NOT NULL AND min_buyout > 0
+               ORDER BY snapshot_time DESC LIMIT 1""",
+            (item_id,),
+        ).fetchone()
+
+        avg_row = conn.execute(
+            """SELECT AVG(min_buyout) as avg_price, COUNT(*) as cnt
+               FROM price_snapshots
+               WHERE item_id = ? AND snapshot_time >= ? AND min_buyout IS NOT NULL AND min_buyout > 0""",
+            (item_id, seven_days_ago),
+        ).fetchone()
+
+        if not latest or not avg_row or not avg_row["avg_price"] or avg_row["cnt"] < 2:
+            continue
+
+        total += 1
+        pct = (latest["min_buyout"] - avg_row["avg_price"]) / avg_row["avg_price"]
+
+        if pct >= 0.05:
+            above += 1
+        elif pct <= -0.05:
+            below += 1
+        else:
+            normal += 1
+
+    conn.close()
+    return {"above": above, "below": below, "normal": normal, "total": total}
+
+
+def get_market_movers():
+    """Get items with the biggest price changes in the last 24 hours.
+
+    Compares the latest snapshot to the most recent snapshot older than 12h ago.
+    Returns top gainers and losers.
+    """
+    conn = get_db()
+    now = int(time.time())
+    twelve_hours_ago = now - 12 * 3600
+
+    items = conn.execute("SELECT item_id, name, category FROM items").fetchall()
+    movers = []
+
+    for item in items:
+        item_id = item["item_id"]
+
+        latest = conn.execute(
+            """SELECT min_buyout FROM price_snapshots
+               WHERE item_id = ? AND min_buyout IS NOT NULL AND min_buyout > 0
+               ORDER BY snapshot_time DESC LIMIT 1""",
+            (item_id,),
+        ).fetchone()
+
+        previous = conn.execute(
+            """SELECT min_buyout FROM price_snapshots
+               WHERE item_id = ? AND snapshot_time < ? AND min_buyout IS NOT NULL AND min_buyout > 0
+               ORDER BY snapshot_time DESC LIMIT 1""",
+            (item_id, twelve_hours_ago),
+        ).fetchone()
+
+        if not latest or not previous or previous["min_buyout"] == 0:
+            continue
+
+        change_pct = (latest["min_buyout"] - previous["min_buyout"]) / previous["min_buyout"]
+
+        movers.append({
+            "item_id": item_id,
+            "name": item["name"],
+            "category": item["category"],
+            "current_price": latest["min_buyout"],
+            "previous_price": previous["min_buyout"],
+            "change_pct": change_pct,
+        })
+
+    conn.close()
+
+    # Sort by absolute change
+    movers.sort(key=lambda m: abs(m["change_pct"]), reverse=True)
+
+    # Split into gainers and losers
+    gainers = [m for m in movers if m["change_pct"] > 0.01][:6]
+    losers = [m for m in movers if m["change_pct"] < -0.01][:6]
+
+    return {"gainers": gainers, "losers": losers}
+
+
 def get_day_of_week_averages(item_id, days=14):
     """Get average prices by day of week for an item.
 

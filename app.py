@@ -6,7 +6,7 @@ from flask import Flask, render_template, jsonify, request
 from db import init_db, get_db, populate_items, insert_price_snapshots_bulk, insert_trades_bulk
 from config import TBC_ITEMS, CATEGORIES, RAID_DAYS, DEPLOYMENT_MODE, PUSH_API_KEY
 from tsm_parser import copper_to_gold_float
-from analyzer import get_recommendations, get_sell_recommendations, get_day_of_week_averages
+from analyzer import get_recommendations, get_sell_recommendations, get_market_summary, get_market_movers, get_day_of_week_averages
 
 # Only import collector in local mode (it needs AppData.lua access)
 if DEPLOYMENT_MODE == "local":
@@ -167,6 +167,25 @@ def api_sell_recommendations():
         r["avg_off_day_gold"] = copper_to_gold_float(r["avg_off_day_price"])
         r["icon_url"] = get_icon_url(r["item_id"])
     return jsonify(recs)
+
+
+@app.route("/api/market-summary")
+def api_market_summary():
+    """Get overall market health summary."""
+    return jsonify(get_market_summary())
+
+
+@app.route("/api/market-movers")
+def api_market_movers():
+    """Get items with biggest recent price changes."""
+    data = get_market_movers()
+    # Convert copper to gold
+    for lst in [data["gainers"], data["losers"]]:
+        for m in lst:
+            m["current_price_gold"] = copper_to_gold_float(m["current_price"])
+            m["previous_price_gold"] = copper_to_gold_float(m["previous_price"])
+            m["icon_url"] = get_icon_url(m["item_id"])
+    return jsonify(data)
 
 
 @app.route("/api/dow/<int:item_id>")

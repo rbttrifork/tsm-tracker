@@ -5,13 +5,16 @@ let currentCategory = "all";
 let currentChartItemId = null;
 let priceChart = null;
 let dowChart = null;
+let itemsCollapsed = false;
 
 // --- Initialization ---
 
 document.addEventListener("DOMContentLoaded", () => {
+    loadMarketSummary();
     loadItems();
     loadRecommendations();
     loadSellRecommendations();
+    loadMarketMovers();
     loadStats();
 });
 
@@ -20,6 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
 async function loadItems() {
     const res = await fetch("/api/items");
     allItems = await res.json();
+    document.getElementById("items-count").textContent = `(${allItems.length})`;
     renderItemGrid();
 }
 
@@ -35,6 +39,18 @@ async function loadSellRecommendations() {
     renderSellRecommendations(recs);
 }
 
+async function loadMarketSummary() {
+    const res = await fetch("/api/market-summary");
+    const data = await res.json();
+    renderMarketPulse(data);
+}
+
+async function loadMarketMovers() {
+    const res = await fetch("/api/market-movers");
+    const data = await res.json();
+    renderMarketMovers(data);
+}
+
 async function loadStats() {
     const res = await fetch("/api/stats");
     const stats = await res.json();
@@ -45,7 +61,7 @@ async function loadStats() {
         const time = d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
         el.textContent = `Last updated: ${date} ${time}`;
     } else {
-        el.textContent = "No data yet. Import backups or collect a snapshot.";
+        el.textContent = "No data yet.";
     }
 }
 
@@ -61,6 +77,128 @@ function formatGold(value) {
     if (s > 0) parts.push(`${s}s`);
     if (c > 0 && g === 0) parts.push(`${c}c`);
     return parts.length > 0 ? parts.join(" ") : "0c";
+}
+
+function renderMarketPulse(data) {
+    const aboveEl = document.getElementById("pulse-above");
+    const normalEl = document.getElementById("pulse-normal");
+    const belowEl = document.getElementById("pulse-below");
+    const barEl = document.getElementById("pulse-bar");
+
+    aboveEl.innerHTML = `<span class="pulse-arrow up">&#9650;</span> ${data.above} above avg`;
+    belowEl.innerHTML = `<span class="pulse-arrow down">&#9660;</span> ${data.below} below avg`;
+    normalEl.textContent = `${data.normal} normal`;
+
+    if (data.total > 0) {
+        const abovePct = (data.above / data.total) * 100;
+        const normalPct = (data.normal / data.total) * 100;
+        const belowPct = (data.below / data.total) * 100;
+        barEl.innerHTML = `
+            <div class="pulse-segment above" style="width:${abovePct}%"></div>
+            <div class="pulse-segment normal" style="width:${normalPct}%"></div>
+            <div class="pulse-segment below" style="width:${belowPct}%"></div>
+        `;
+    }
+}
+
+function renderRecommendations(recs) {
+    const container = document.getElementById("recommendations-list");
+    const buyRecs = recs.filter(r => r.signal === "strong_buy" || r.signal === "buy");
+
+    if (buyRecs.length === 0) {
+        container.innerHTML = '<div class="no-data">No buy-low opportunities right now.</div>';
+        return;
+    }
+
+    const INITIAL_SHOW = 5;
+    const renderBuyCard = r => `
+        <div class="compact-card buy ${r.signal}" onclick="openChart(${r.item_id})">
+            ${r.icon_url ? `<img class="card-icon" src="${r.icon_url}" alt="" loading="lazy" onerror="this.style.display='none'">` : ''}
+            <div class="card-body">
+                <div class="card-top">
+                    <span class="card-name">${r.name}</span>
+                    <span class="signal-badge ${r.signal}">${r.signal.replace("_", " ")}</span>
+                </div>
+                <div class="card-prices">
+                    <span class="card-current">${formatGold(r.current_min_buyout_gold)}</span>
+                    <span class="card-avg">avg ${formatGold(r.avg_7d_gold)}</span>
+                </div>
+                <div class="card-bar-wrap">
+                    <div class="card-bar buy-bar" style="width:${Math.min(Math.abs(r.discount_pct) * 200, 100)}%"></div>
+                    <span class="card-pct">-${(r.discount_pct * 100).toFixed(1)}%</span>
+                </div>
+            </div>
+        </div>
+    `;
+
+    const visible = buyRecs.slice(0, INITIAL_SHOW);
+    const hidden = buyRecs.slice(INITIAL_SHOW);
+    container.innerHTML = visible.map(renderBuyCard).join("") +
+        (hidden.length > 0 ? `<div class="more-cards hidden" id="buy-more">${hidden.map(renderBuyCard).join("")}</div>
+        <button class="show-more-btn" onclick="toggleMore('buy-more', this)">Show ${hidden.length} more</button>` : '');
+}
+
+function renderSellRecommendations(recs) {
+    const container = document.getElementById("sell-recommendations-list");
+    const sellRecs = recs.filter(r => r.signal === "strong_sell" || r.signal === "sell");
+
+    if (sellRecs.length === 0) {
+        container.innerHTML = '<div class="no-data">No sell-high opportunities right now.</div>';
+        return;
+    }
+
+    const INITIAL_SHOW = 5;
+    const renderSellCard = r => `
+        <div class="compact-card sell ${r.signal}" onclick="openChart(${r.item_id})">
+            ${r.icon_url ? `<img class="card-icon" src="${r.icon_url}" alt="" loading="lazy" onerror="this.style.display='none'">` : ''}
+            <div class="card-body">
+                <div class="card-top">
+                    <span class="card-name">${r.name}</span>
+                    <span class="signal-badge ${r.signal}">${r.signal.replace("_", " ")}</span>
+                </div>
+                <div class="card-prices">
+                    <span class="card-current">${formatGold(r.current_min_buyout_gold)}</span>
+                    <span class="card-avg">avg ${formatGold(r.avg_7d_gold)}</span>
+                </div>
+                <div class="card-bar-wrap">
+                    <div class="card-bar sell-bar" style="width:${Math.min(r.premium_pct * 200, 100)}%"></div>
+                    <span class="card-pct">+${(r.premium_pct * 100).toFixed(1)}%</span>
+                </div>
+            </div>
+        </div>
+    `;
+
+    const visible = sellRecs.slice(0, INITIAL_SHOW);
+    const hidden = sellRecs.slice(INITIAL_SHOW);
+    container.innerHTML = visible.map(renderSellCard).join("") +
+        (hidden.length > 0 ? `<div class="more-cards hidden" id="sell-more">${hidden.map(renderSellCard).join("")}</div>
+        <button class="show-more-btn" onclick="toggleMore('sell-more', this)">Show ${hidden.length} more</button>` : '');
+}
+
+function renderMarketMovers(data) {
+    const container = document.getElementById("movers-grid");
+
+    if (data.gainers.length === 0 && data.losers.length === 0) {
+        container.innerHTML = '<div class="no-data">Not enough data for market movers yet.</div>';
+        return;
+    }
+
+    const renderMover = (m, isGainer) => `
+        <div class="mover-card ${isGainer ? 'gainer' : 'loser'}" onclick="openChart(${m.item_id})">
+            ${m.icon_url ? `<img class="mover-icon" src="${m.icon_url}" alt="" loading="lazy" onerror="this.style.display='none'">` : ''}
+            <div class="mover-info">
+                <span class="mover-name">${m.name}</span>
+                <span class="mover-price">${formatGold(m.current_price_gold)}</span>
+            </div>
+            <span class="mover-change ${isGainer ? 'up' : 'down'}">
+                ${isGainer ? '&#9650;' : '&#9660;'} ${(Math.abs(m.change_pct) * 100).toFixed(1)}%
+            </span>
+        </div>
+    `;
+
+    container.innerHTML =
+        data.gainers.map(m => renderMover(m, true)).join("") +
+        data.losers.map(m => renderMover(m, false)).join("");
 }
 
 function renderItemGrid() {
@@ -80,7 +218,6 @@ function renderItemGrid() {
         </div>
     `).join("");
 
-    // Load latest prices for visible items
     loadLatestPrices(filtered.map(i => i.item_id));
 }
 
@@ -102,58 +239,28 @@ async function loadLatestPrices(itemIds) {
     }
 }
 
-function renderRecommendations(recs) {
-    const container = document.getElementById("recommendations-list");
-    const buyRecs = recs.filter(r => r.signal === "strong_buy" || r.signal === "buy");
+// --- Show More Toggle ---
 
-    if (buyRecs.length === 0) {
-        container.innerHTML = '<div style="color: var(--text-dim); padding: 1rem;">No buy-low opportunities detected right now. Prices are near or above average.</div>';
-        return;
+function toggleMore(id, btn) {
+    const el = document.getElementById(id);
+    if (el.classList.contains("hidden")) {
+        el.classList.remove("hidden");
+        btn.textContent = "Show less";
+    } else {
+        el.classList.add("hidden");
+        const count = el.children.length;
+        btn.textContent = `Show ${count} more`;
     }
-
-    container.innerHTML = buyRecs.map(r => `
-        <div class="rec-card ${r.signal}" onclick="openChart(${r.item_id})">
-            <div class="rec-header">
-                ${r.icon_url ? `<img class="rec-icon" src="${r.icon_url}" alt="" loading="lazy" onerror="this.style.display='none'">` : ''}
-                <span class="rec-name">${r.name}</span>
-                <span class="rec-signal ${r.signal}">${r.signal.replace("_", " ")}</span>
-            </div>
-            <div class="rec-details">
-                <span>Current: <span class="gold-value">${formatGold(r.current_min_buyout_gold)}</span></span>
-                <span>7d Avg: <span class="value">${formatGold(r.avg_7d_gold)}</span></span>
-                <span>Discount: <span class="discount">${(r.discount_pct * 100).toFixed(1)}%</span></span>
-                <span>Exp. Profit: <span class="profit">+${(r.expected_profit_pct * 100).toFixed(1)}%</span></span>
-                <span>Raid Day Avg: <span class="value">${formatGold(r.avg_raid_day_gold)}</span></span>
-                <span>Confidence: <span class="value">${(r.confidence * 100).toFixed(0)}%</span></span>
-            </div>
-        </div>
-    `).join("");
 }
 
-function renderSellRecommendations(recs) {
-    const container = document.getElementById("sell-recommendations-list");
-    const sellRecs = recs.filter(r => r.signal === "strong_sell" || r.signal === "sell");
+// --- Collapsible Items ---
 
-    if (sellRecs.length === 0) {
-        container.innerHTML = '<div style="color: var(--text-dim); padding: 1rem;">No sell-high opportunities detected right now. Prices are near or below average.</div>';
-        return;
-    }
-
-    container.innerHTML = sellRecs.map(r => `
-        <div class="sell-card ${r.signal}" onclick="openChart(${r.item_id})">
-            <div class="rec-header">
-                ${r.icon_url ? `<img class="rec-icon" src="${r.icon_url}" alt="" loading="lazy" onerror="this.style.display='none'">` : ''}
-                <span class="rec-name">${r.name}</span>
-                <span class="sell-signal ${r.signal}">${r.signal.replace("_", " ")}</span>
-            </div>
-            <div class="rec-details">
-                <span>Current: <span class="gold-value">${formatGold(r.current_min_buyout_gold)}</span></span>
-                <span>7d Avg: <span class="value">${formatGold(r.avg_7d_gold)}</span></span>
-                <span>Premium: <span class="profit">+${(r.premium_pct * 100).toFixed(1)}%</span></span>
-                <span>Raid Day Avg: <span class="value">${formatGold(r.avg_raid_day_gold)}</span></span>
-            </div>
-        </div>
-    `).join("");
+function toggleItems() {
+    itemsCollapsed = !itemsCollapsed;
+    const content = document.getElementById("items-collapsible");
+    const arrow = document.getElementById("items-toggle-arrow");
+    content.style.display = itemsCollapsed ? "none" : "block";
+    arrow.innerHTML = itemsCollapsed ? "&#9654;" : "&#9660;";
 }
 
 // --- Category Filter ---
@@ -173,7 +280,6 @@ async function openChart(itemId) {
     const modal = document.getElementById("chart-modal");
     modal.classList.remove("hidden");
 
-    // Find item name
     const item = allItems.find(i => i.item_id === itemId);
     const titleEl = document.getElementById("chart-title");
     const iconHtml = item && item.icon_url ? `<img class="chart-title-icon" src="${item.icon_url}" alt="">` : '';
@@ -200,7 +306,6 @@ function reloadChart() {
 async function loadChartData(itemId) {
     const days = document.getElementById("chart-days").value;
 
-    // Fetch price snapshots and trade history in parallel
     const [priceRes, tradeRes] = await Promise.all([
         fetch(`/api/prices/${itemId}?days=${days}`),
         fetch(`/api/trades/${itemId}?days=${days}`),
@@ -212,7 +317,6 @@ async function loadChartData(itemId) {
     const minBuyout = data.data.map(d => d.minBuyout);
     const dbMarket = data.data.map(d => d.marketValue);
 
-    // Build scatter datasets for buy/sell trades
     const buyTrades = tradeData.trades
         .filter(t => t.type === "buy")
         .map(t => ({ x: new Date(t.time * 1000), y: t.priceGold }));
@@ -224,7 +328,6 @@ async function loadChartData(itemId) {
 
     const ctx = document.getElementById("price-chart").getContext("2d");
 
-    // Create raid day highlight bands
     const raidDayPlugin = {
         id: "raidDayHighlight",
         beforeDraw(chart) {
@@ -234,7 +337,6 @@ async function loadChartData(itemId) {
             ctx.save();
             ctx.fillStyle = "rgba(233, 69, 96, 0.08)";
 
-            // Find raid day ranges
             const min = scales.x.min;
             const max = scales.x.max;
             const dayMs = 86400000;
@@ -243,7 +345,6 @@ async function loadChartData(itemId) {
             d.setHours(0, 0, 0, 0);
 
             while (d.getTime() <= max) {
-                // d.getDay(): 0=Sun, 1=Mon, ... convert to our format: 0=Mon
                 const ourDow = (d.getDay() + 6) % 7;
                 if (window.RAID_DAYS.includes(ourDow)) {
                     const x1 = scales.x.getPixelForValue(d.getTime());
@@ -415,9 +516,11 @@ async function collectSnapshot() {
             btn.textContent = "Collect Snapshot";
             btn.disabled = false;
         }, 3000);
-        // Refresh
         loadItems();
         loadRecommendations();
+        loadSellRecommendations();
+        loadMarketSummary();
+        loadMarketMovers();
         loadStats();
     } catch (e) {
         btn.textContent = "Error!";

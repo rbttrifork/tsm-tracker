@@ -10,9 +10,11 @@
 </head>
 <body>
     <header>
-        <h1>TSM Price Tracker</h1>
-        <span class="realm">Spineshatter - Horde (EU-Fresh)</span>
-        <div class="header-actions">
+        <div class="header-left">
+            <h1>TSM Price Tracker</h1>
+            <span class="realm">Spineshatter - Horde (EU-Fresh)</span>
+        </div>
+        <div class="header-right">
             {% if deployment_mode == 'local' %}
             <button id="btn-collect" onclick="collectSnapshot()">Collect Snapshot</button>
             {% endif %}
@@ -20,30 +22,53 @@
         </div>
     </header>
 
-    <main>
-        <!-- Recommendations Panel -->
-        <section id="recommendations-panel">
-            <h2>Buy-Low Recommendations</h2>
-            <div id="recommendations-list"></div>
-        </section>
-
-        <!-- Sell High Recommendations -->
-        <section id="sell-recommendations-panel">
-            <h2>Sell High Recommendations</h2>
-            <div id="sell-recommendations-list"></div>
-        </section>
-
-        <!-- Category Tabs -->
-        <section id="items-section">
-            <div class="category-tabs">
-                <button class="tab active" data-category="all" onclick="filterCategory('all')">All</button>
-                {% for cat_id, cat_name in categories %}
-                <button class="tab" data-category="{{ cat_id }}" onclick="filterCategory('{{ cat_id }}')">{{ cat_name }}</button>
-                {% endfor %}
+    <!-- Market Pulse -->
+    <div id="market-pulse" class="market-pulse">
+        <div class="pulse-content">
+            <span class="pulse-label">Market Pulse</span>
+            <div class="pulse-stats">
+                <span class="pulse-above" id="pulse-above"></span>
+                <span class="pulse-normal" id="pulse-normal"></span>
+                <span class="pulse-below" id="pulse-below"></span>
             </div>
+            <div class="pulse-bar" id="pulse-bar"></div>
+        </div>
+    </div>
 
-            <!-- Item Grid -->
-            <div id="item-grid"></div>
+    <main>
+        <!-- Side-by-side Recommendations -->
+        <div class="recommendations-grid">
+            <section class="rec-panel">
+                <h2 class="section-title buy-title">Buy Low</h2>
+                <div id="recommendations-list"></div>
+            </section>
+            <section class="rec-panel">
+                <h2 class="section-title sell-title">Sell High</h2>
+                <div id="sell-recommendations-list"></div>
+            </section>
+        </div>
+
+        <!-- Market Movers -->
+        <section class="market-movers">
+            <h2 class="section-title movers-title">Market Movers</h2>
+            <div class="movers-grid" id="movers-grid"></div>
+        </section>
+
+        <!-- All Items (collapsible) -->
+        <section id="items-section">
+            <h2 class="section-title items-title collapsible" onclick="toggleItems()">
+                <span id="items-toggle-arrow">&#9660;</span>
+                All Items <span id="items-count" class="section-count"></span>
+            </h2>
+            <div id="items-collapsible">
+                <div class="category-tabs">
+                    <button class="tab active" data-category="all" onclick="filterCategory('all')">All</button>
+                    {% for cat_id, cat_name in categories %}
+                    <button class="tab" data-category="{{ cat_id }}" onclick="filterCategory('{{ cat_id }}')">{{ cat_name }}</button>
+                    {% endfor %}
+                </div>
+                <div id="item-grid"></div>
+            </div>
         </section>
 
         <!-- Price Chart Modal -->
@@ -74,7 +99,6 @@
 
     <script src="/static/app.js"></script>
     <script>
-        // Pass raid days from server config
         window.RAID_DAYS = {{ raid_days | tojson }};
     </script>
 </body>
