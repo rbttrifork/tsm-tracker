@@ -106,25 +106,70 @@ TBC_ITEMS = {
     27438: ("Golden Darter", "food", "inv_misc_fish_36"),
     27439: ("Furious Crawdad", "food", "inv_misc_fish_14"),
 
-    # Gems - Red
-    24027: ("Living Ruby", "gem", "inv_jewelcrafting_livingruby_03"),
-    24028: ("Crimson Spinel", "gem", "inv_jewelcrafting_livingruby_03"),  # actually T6 gem
+    # Raw Gems - Rare
+    23436: ("Living Ruby", "gem", "inv_jewelcrafting_livingruby_01"),
+    23439: ("Noble Topaz", "gem", "inv_jewelcrafting_nobletopaz_01"),
+    23440: ("Dawnstone", "gem", "inv_jewelcrafting_dawnstone_01"),
+    23438: ("Star of Elune", "gem", "inv_jewelcrafting_starofelune_01"),
+    23437: ("Talasite", "gem", "inv_jewelcrafting_talasite_01"),
+    23441: ("Nightseye", "gem", "inv_jewelcrafting_nightseye_01"),
+
+    # Raw Gems - Epic
+    32227: ("Crimson Spinel", "gem", "inv_jewelcrafting_crimsonspinel_01"),
+    32229: ("Lionseye", "gem", "inv_jewelcrafting_lionseye_01"),
+    32228: ("Empyrean Sapphire", "gem", "inv_jewelcrafting_empyreansapphire_01"),
+    32231: ("Pyrestone", "gem", "inv_jewelcrafting_pyrestone_01"),
+    32249: ("Seaspray Emerald", "gem", "inv_jewelcrafting_seasprayemerald_01"),
+    32230: ("Shadowsong Amethyst", "gem", "inv_jewelcrafting_shadowsongamethyst_01"),
+
+    # Cut Gems - Rare Red (Living Ruby)
+    24027: ("Bold Living Ruby", "gem", "inv_jewelcrafting_livingruby_03"),
+    24028: ("Delicate Living Ruby", "gem", "inv_jewelcrafting_livingruby_03"),
+    24029: ("Teardrop Living Ruby", "gem", "inv_jewelcrafting_livingruby_03"),
     24030: ("Runed Living Ruby", "gem", "inv_jewelcrafting_livingruby_03"),
 
-    # Gems - Orange
-    24032: ("Noble Topaz", "gem", "inv_jewelcrafting_dawnstone_03"),
+    # Cut Gems - Rare Yellow (Dawnstone)
+    24047: ("Brilliant Dawnstone", "gem", "inv_jewelcrafting_dawnstone_03"),
+    24048: ("Smooth Dawnstone", "gem", "inv_jewelcrafting_dawnstone_03"),
+    24051: ("Rigid Dawnstone", "gem", "inv_jewelcrafting_dawnstone_03"),
 
-    # Gems - Yellow
-    24036: ("Dawnstone", "gem", "inv_jewelcrafting_livingruby_03"),
+    # Cut Gems - Rare Blue (Star of Elune)
+    24033: ("Solid Star of Elune", "gem", "inv_jewelcrafting_starofelune_03"),
+    24035: ("Sparkling Star of Elune", "gem", "inv_jewelcrafting_starofelune_03"),
 
-    # Gems - Blue
-    24039: ("Star of Elune", "gem", "inv_jewelcrafting_starofelune_03"),
+    # Cut Gems - Rare Orange (Noble Topaz)
+    24058: ("Inscribed Noble Topaz", "gem", "inv_jewelcrafting_nobletopaz_03"),
+    24059: ("Potent Noble Topaz", "gem", "inv_jewelcrafting_nobletopaz_03"),
+    24061: ("Glinting Noble Topaz", "gem", "inv_jewelcrafting_nobletopaz_03"),
 
-    # Gems - Green
-    24048: ("Talasite", "gem", "inv_jewelcrafting_dawnstone_03"),
+    # Cut Gems - Rare Green (Talasite)
+    24066: ("Radiant Talasite", "gem", "inv_jewelcrafting_talasite_03"),
+    24067: ("Jagged Talasite", "gem", "inv_jewelcrafting_talasite_03"),
 
-    # Gems - Purple
-    24054: ("Nightseye", "gem", "inv_jewelcrafting_nightseye_03"),
+    # Cut Gems - Rare Purple (Nightseye)
+    24054: ("Sovereign Nightseye", "gem", "inv_jewelcrafting_nightseye_03"),
+    24055: ("Shifting Nightseye", "gem", "inv_jewelcrafting_nightseye_03"),
+
+    # Cut Gems - Epic Red (Crimson Spinel)
+    32193: ("Bold Crimson Spinel", "gem", "inv_jewelcrafting_crimsonspinel_02"),
+    32194: ("Delicate Crimson Spinel", "gem", "inv_jewelcrafting_crimsonspinel_02"),
+    32196: ("Runed Crimson Spinel", "gem", "inv_jewelcrafting_crimsonspinel_02"),
+
+    # Cut Gems - Epic Yellow (Lionseye)
+    32204: ("Brilliant Lionseye", "gem", "inv_jewelcrafting_lionseye_02"),
+    32205: ("Smooth Lionseye", "gem", "inv_jewelcrafting_lionseye_02"),
+    32206: ("Rigid Lionseye", "gem", "inv_jewelcrafting_lionseye_02"),
+
+    # Cut Gems - Epic Blue (Empyrean Sapphire)
+    32200: ("Solid Empyrean Sapphire", "gem", "inv_jewelcrafting_empyreansapphire_02"),
+
+    # Cut Gems - Epic Orange (Pyrestone)
+    32217: ("Inscribed Pyrestone", "gem", "inv_jewelcrafting_pyrestone_02"),
+    32220: ("Glinting Pyrestone", "gem", "inv_jewelcrafting_pyrestone_02"),
+
+    # Cut Gems - Epic Purple (Shadowsong Amethyst)
+    32211: ("Sovereign Shadowsong Amethyst", "gem", "inv_jewelcrafting_shadowsongamethyst_02"),
+    32212: ("Shifting Shadowsong Amethyst", "gem", "inv_jewelcrafting_shadowsongamethyst_02"),
 
     # Enchanting Mats
     22449: ("Large Prismatic Shard", "enchanting", "inv_enchant_shardprismaticlarge"),
@@ -167,6 +212,20 @@ TBC_ITEMS = {
     23793: ("Heavy Knothide Leather", "leather", "inv_misc_leatherscrap_11"),
     29548: ("Nether Dragonscales", "leather", "inv_misc_monsterscales_10"),
 
+    # Scrolls
+    10305: ("Scroll of Protection IV", "scroll", "inv_scroll_07"),
+    10306: ("Scroll of Spirit IV", "scroll", "inv_scroll_01"),
+    10307: ("Scroll of Stamina IV", "scroll", "inv_scroll_07"),
+    10308: ("Scroll of Intellect IV", "scroll", "inv_scroll_01"),
+    10309: ("Scroll of Agility IV", "scroll", "inv_scroll_02"),
+    10310: ("Scroll of Strength IV", "scroll", "inv_scroll_02"),
+    27498: ("Scroll of Agility V", "scroll", "inv_scroll_02"),
+    27499: ("Scroll of Intellect V", "scroll", "inv_scroll_01"),
+    27500: ("Scroll of Protection V", "scroll", "inv_scroll_07"),
+    27501: ("Scroll of Spirit V", "scroll", "inv_scroll_01"),
+    27502: ("Scroll of Stamina V", "scroll", "inv_scroll_07"),
+    27503: ("Scroll of Strength V", "scroll", "inv_scroll_02"),
+
     # Misc Crafting
     23571: ("Primal Nether", "other", "spell_nature_lightningoverload"),
     23572: ("Nether Vortex", "other", "inv_elemental_primal_nether"),
@@ -185,5 +244,6 @@ CATEGORIES = [
     ("ore", "Ores & Bars"),
     ("cloth", "Cloth"),
     ("leather", "Leather"),
+    ("scroll", "Scrolls"),
     ("other", "Other"),
 ]
