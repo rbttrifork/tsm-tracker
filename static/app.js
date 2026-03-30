@@ -6,6 +6,9 @@ let currentChartItemId = null;
 let priceChart = null;
 let dowChart = null;
 let itemsCollapsed = false;
+let ignoredItems = new Set(JSON.parse(localStorage.getItem("tsm_ignored_items") || "[]"));
+let lastBuyRecs = [];
+let lastSellRecs = [];
 
 // --- Initialization ---
 
@@ -102,11 +105,19 @@ function renderMarketPulse(data) {
 }
 
 function renderRecommendations(recs) {
+    lastBuyRecs = recs;
     const container = document.getElementById("recommendations-list");
-    const buyRecs = recs.filter(r => r.signal === "strong_buy" || r.signal === "buy");
+    const allBuyRecs = recs.filter(r => r.signal === "strong_buy" || r.signal === "buy");
+    const buyRecs = allBuyRecs.filter(r => !ignoredItems.has(r.item_id));
+
+    if (buyRecs.length === 0 && allBuyRecs.length === 0) {
+        container.innerHTML = '<div class="no-data">No buy-low opportunities right now.</div>';
+        return;
+    }
 
     if (buyRecs.length === 0) {
-        container.innerHTML = '<div class="no-data">No buy-low opportunities right now.</div>';
+        container.innerHTML = '<div class="no-data">All buy-low items are ignored.</div>' +
+            renderIgnoredFooter(allBuyRecs, "buy-ignored");
         return;
     }
 
@@ -118,6 +129,7 @@ function renderRecommendations(recs) {
                 <div class="card-top">
                     <span class="card-name">${r.name}</span>
                     <span class="signal-badge ${r.signal}">${r.signal.replace("_", " ")}</span>
+                    <button class="card-dismiss" onclick="ignoreItem(${r.item_id}, event)" title="Ignore this item">&times;</button>
                 </div>
                 <div class="card-prices">
                     <span class="card-current">${formatGold(r.current_min_buyout_gold)}</span>
@@ -135,15 +147,24 @@ function renderRecommendations(recs) {
     const hidden = buyRecs.slice(INITIAL_SHOW);
     container.innerHTML = visible.map(renderBuyCard).join("") +
         (hidden.length > 0 ? `<div class="more-cards hidden" id="buy-more">${hidden.map(renderBuyCard).join("")}</div>
-        <button class="show-more-btn" onclick="toggleMore('buy-more', this)">Show ${hidden.length} more</button>` : '');
+        <button class="show-more-btn" onclick="toggleMore('buy-more', this)">Show ${hidden.length} more</button>` : '') +
+        renderIgnoredFooter(allBuyRecs, "buy-ignored");
 }
 
 function renderSellRecommendations(recs) {
+    lastSellRecs = recs;
     const container = document.getElementById("sell-recommendations-list");
-    const sellRecs = recs.filter(r => r.signal === "strong_sell" || r.signal === "sell");
+    const allSellRecs = recs.filter(r => r.signal === "strong_sell" || r.signal === "sell");
+    const sellRecs = allSellRecs.filter(r => !ignoredItems.has(r.item_id));
+
+    if (sellRecs.length === 0 && allSellRecs.length === 0) {
+        container.innerHTML = '<div class="no-data">No sell-high opportunities right now.</div>';
+        return;
+    }
 
     if (sellRecs.length === 0) {
-        container.innerHTML = '<div class="no-data">No sell-high opportunities right now.</div>';
+        container.innerHTML = '<div class="no-data">All sell-high items are ignored.</div>' +
+            renderIgnoredFooter(allSellRecs, "sell-ignored");
         return;
     }
 
@@ -155,6 +176,7 @@ function renderSellRecommendations(recs) {
                 <div class="card-top">
                     <span class="card-name">${r.name}</span>
                     <span class="signal-badge ${r.signal}">${r.signal.replace("_", " ")}</span>
+                    <button class="card-dismiss" onclick="ignoreItem(${r.item_id}, event)" title="Ignore this item">&times;</button>
                 </div>
                 <div class="card-prices">
                     <span class="card-current">${formatGold(r.current_min_buyout_gold)}</span>
@@ -172,7 +194,8 @@ function renderSellRecommendations(recs) {
     const hidden = sellRecs.slice(INITIAL_SHOW);
     container.innerHTML = visible.map(renderSellCard).join("") +
         (hidden.length > 0 ? `<div class="more-cards hidden" id="sell-more">${hidden.map(renderSellCard).join("")}</div>
-        <button class="show-more-btn" onclick="toggleMore('sell-more', this)">Show ${hidden.length} more</button>` : '');
+        <button class="show-more-btn" onclick="toggleMore('sell-more', this)">Show ${hidden.length} more</button>` : '') +
+        renderIgnoredFooter(allSellRecs, "sell-ignored");
 }
 
 function renderMarketMovers(data) {
@@ -500,6 +523,48 @@ async function loadDowData(itemId) {
             },
         },
     });
+}
+
+// --- Ignore Items ---
+
+function saveIgnoredItems() {
+    localStorage.setItem("tsm_ignored_items", JSON.stringify([...ignoredItems]));
+}
+
+function ignoreItem(itemId, event) {
+    event.stopPropagation();
+    ignoredItems.add(itemId);
+    saveIgnoredItems();
+    renderRecommendations(lastBuyRecs);
+    renderSellRecommendations(lastSellRecs);
+}
+
+function unignoreItem(itemId) {
+    ignoredItems.delete(itemId);
+    saveIgnoredItems();
+    renderRecommendations(lastBuyRecs);
+    renderSellRecommendations(lastSellRecs);
+}
+
+function toggleIgnoredPanel(panelId) {
+    const panel = document.getElementById(panelId);
+    panel.classList.toggle("hidden");
+}
+
+function renderIgnoredFooter(recs, panelId) {
+    const ignoredRecs = recs.filter(r => ignoredItems.has(r.item_id));
+    if (ignoredRecs.length === 0) return '';
+
+    return `<button class="ignored-toggle" onclick="toggleIgnoredPanel('${panelId}')">${ignoredRecs.length} ignored</button>
+        <div id="${panelId}" class="ignored-panel hidden">
+            ${ignoredRecs.map(r => `
+                <div class="ignored-item">
+                    ${r.icon_url ? `<img class="ignored-icon" src="${r.icon_url}" alt="" onerror="this.style.display='none'">` : ''}
+                    <span class="ignored-name">${r.name}</span>
+                    <button class="restore-btn" onclick="unignoreItem(${r.item_id})">Restore</button>
+                </div>
+            `).join("")}
+        </div>`;
 }
 
 // --- Actions ---
