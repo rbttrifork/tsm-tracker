@@ -299,6 +299,18 @@ main {
 .compact-card.buy .card-pct { color: var(--orange); }
 .compact-card.sell .card-pct { color: var(--green); }
 
+.card-profit {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--green);
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
+.card-profit.sell-profit {
+    color: var(--gold);
+}
+
 /* Dismiss / Ignore Button */
 .card-dismiss {
     background: none;

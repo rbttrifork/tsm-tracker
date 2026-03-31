@@ -122,7 +122,9 @@ function renderRecommendations(recs) {
     }
 
     const INITIAL_SHOW = 5;
-    const renderBuyCard = r => `
+    const renderBuyCard = r => {
+        const profitGold = (r.avg_raid_day_gold || r.avg_7d_gold) - r.current_min_buyout_gold;
+        return `
         <div class="compact-card buy ${r.signal}" onclick="openChart(${r.item_id})">
             ${r.icon_url ? `<img class="card-icon" src="${r.icon_url}" alt="" loading="lazy" onerror="this.style.display='none'">` : ''}
             <div class="card-body">
@@ -138,10 +140,11 @@ function renderRecommendations(recs) {
                 <div class="card-bar-wrap">
                     <div class="card-bar buy-bar" style="width:${Math.min(Math.abs(r.discount_pct) * 200, 100)}%"></div>
                     <span class="card-pct">-${(r.discount_pct * 100).toFixed(1)}%</span>
+                    <span class="card-profit">+${formatGold(profitGold)}</span>
                 </div>
             </div>
-        </div>
-    `;
+        </div>`;
+    };
 
     const visible = buyRecs.slice(0, INITIAL_SHOW);
     const hidden = buyRecs.slice(INITIAL_SHOW);
@@ -169,7 +172,9 @@ function renderSellRecommendations(recs) {
     }
 
     const INITIAL_SHOW = 5;
-    const renderSellCard = r => `
+    const renderSellCard = r => {
+        const premiumGold = r.current_min_buyout_gold - (r.avg_7d_gold || 0);
+        return `
         <div class="compact-card sell ${r.signal}" onclick="openChart(${r.item_id})">
             ${r.icon_url ? `<img class="card-icon" src="${r.icon_url}" alt="" loading="lazy" onerror="this.style.display='none'">` : ''}
             <div class="card-body">
@@ -185,10 +190,11 @@ function renderSellRecommendations(recs) {
                 <div class="card-bar-wrap">
                     <div class="card-bar sell-bar" style="width:${Math.min(r.premium_pct * 200, 100)}%"></div>
                     <span class="card-pct">+${(r.premium_pct * 100).toFixed(1)}%</span>
+                    <span class="card-profit sell-profit">+${formatGold(premiumGold)}</span>
                 </div>
             </div>
-        </div>
-    `;
+        </div>`;
+    };
 
     const visible = sellRecs.slice(0, INITIAL_SHOW);
     const hidden = sellRecs.slice(INITIAL_SHOW);
