@@ -12,6 +12,9 @@ let lastSellRecs = [];
 
 // --- Initialization ---
 
+let currentView = "market";
+let alchemyLoaded = false;
+
 document.addEventListener("DOMContentLoaded", () => {
     loadMarketSummary();
     loadItems();
@@ -19,7 +22,31 @@ document.addEventListener("DOMContentLoaded", () => {
     loadSellRecommendations();
     loadMarketMovers();
     loadStats();
+
+    // Restore last active mastery selection
+    const savedMastery = localStorage.getItem("tsm_alchemy_mastery");
+    if (savedMastery) {
+        const sel = document.getElementById("alchemy-mastery");
+        if (sel) sel.value = savedMastery;
+    }
 });
+
+// --- Top-level view switching ---
+
+function switchView(view) {
+    currentView = view;
+    document.querySelectorAll(".top-tab").forEach(t => {
+        t.classList.toggle("active", t.dataset.view === view);
+    });
+    document.querySelectorAll(".view").forEach(el => {
+        const isTarget = el.classList.contains(`view-${view}`);
+        el.classList.toggle("hidden", !isTarget);
+    });
+
+    if (view === "professions" && !alchemyLoaded) {
+        loadAlchemy();
+    }
+}
 
 // --- Data Loading ---
 
@@ -571,6 +598,176 @@ function renderIgnoredFooter(recs, panelId) {
                 </div>
             `).join("")}
         </div>`;
+}
+
+// --- Professions: Alchemy ---
+
+let lastAlchemyData = null;
+let alchemySort = { column: "profit", direction: "desc" };
+
+// column -> (recipe) => sortable primitive (null sorts last)
+const ALCHEMY_SORT_ACCESSORS = {
+    name:    r => (r.name || "").toLowerCase(),
+    cat:     r => r.mastery_category || "",
+    input:   r => r.input_cost_copper,
+    output:  r => r.revenue_copper,
+    profit:  r => r.profit_copper,
+    margin:  r => r.margin_pct,
+};
+
+function sortAlchemy(column) {
+    if (alchemySort.column === column) {
+        alchemySort.direction = alchemySort.direction === "desc" ? "asc" : "desc";
+    } else {
+        alchemySort.column = column;
+        // Sensible defaults: strings ascending, numbers descending
+        alchemySort.direction = (column === "name" || column === "cat") ? "asc" : "desc";
+    }
+    if (lastAlchemyData) renderAlchemy(lastAlchemyData);
+}
+
+function applyAlchemySort(recipes) {
+    const accessor = ALCHEMY_SORT_ACCESSORS[alchemySort.column] || ALCHEMY_SORT_ACCESSORS.profit;
+    const dir = alchemySort.direction === "asc" ? 1 : -1;
+    return [...recipes].sort((a, b) => {
+        const av = accessor(a);
+        const bv = accessor(b);
+        const aNull = av === null || av === undefined || (typeof av === "number" && isNaN(av));
+        const bNull = bv === null || bv === undefined || (typeof bv === "number" && isNaN(bv));
+        if (aNull && bNull) return 0;
+        if (aNull) return 1;   // nulls always last, regardless of dir
+        if (bNull) return -1;
+        if (av < bv) return -1 * dir;
+        if (av > bv) return  1 * dir;
+        return 0;
+    });
+}
+
+async function loadAlchemy() {
+    const sel = document.getElementById("alchemy-mastery");
+    const mastery = sel ? sel.value : "none";
+    localStorage.setItem("tsm_alchemy_mastery", mastery);
+
+    const container = document.getElementById("alchemy-recipes");
+    container.innerHTML = '<div class="no-data">Loading recipes…</div>';
+
+    try {
+        const res = await fetch(`/api/professions/alchemy?mastery=${encodeURIComponent(mastery)}`);
+        const data = await res.json();
+        lastAlchemyData = data;
+        renderAlchemy(data);
+        alchemyLoaded = true;
+    } catch (e) {
+        container.innerHTML = '<div class="no-data">Failed to load recipes.</div>';
+    }
+}
+
+function sortIndicatorClass(col) {
+    if (alchemySort.column !== col) return "sort-indicator";
+    return `sort-indicator sort-${alchemySort.direction}`;
+}
+
+function renderAlchemy(data) {
+    const container = document.getElementById("alchemy-recipes");
+    const recipes = data.recipes || [];
+    if (recipes.length === 0) {
+        container.innerHTML = '<div class="no-data">No recipes configured.</div>';
+        return;
+    }
+
+    const priceable = applyAlchemySort(recipes.filter(r => !r.has_missing_prices));
+    const missing = recipes.filter(r => r.has_missing_prices);
+
+    const header = `
+        <thead>
+            <tr>
+                <th class="col-output ${sortIndicatorClass("name")}" onclick="sortAlchemy('name')">Recipe</th>
+                <th class="col-cat ${sortIndicatorClass("cat")}" onclick="sortAlchemy('cat')">Cat.</th>
+                <th class="col-num ${sortIndicatorClass("input")}" onclick="sortAlchemy('input')">Input cost</th>
+                <th class="col-num ${sortIndicatorClass("output")}" onclick="sortAlchemy('output')">Output value</th>
+                <th class="col-num ${sortIndicatorClass("profit")}" onclick="sortAlchemy('profit')">Profit / craft</th>
+                <th class="col-num ${sortIndicatorClass("margin")}" onclick="sortAlchemy('margin')">Margin</th>
+                <th class="col-inputs">Inputs (per craft)</th>
+            </tr>
+        </thead>`;
+
+    const html = [
+        `<table class="recipe-table">
+            ${header}
+            <tbody>
+                ${priceable.map(renderRecipeRow).join("")}
+            </tbody>
+        </table>`,
+        missing.length > 0
+            ? `<details class="recipe-missing">
+                <summary>${missing.length} recipe${missing.length === 1 ? "" : "s"} missing price data</summary>
+                <table class="recipe-table">
+                    <thead>
+                        <tr><th class="col-output">Recipe</th><th class="col-cat">Cat.</th><th class="col-inputs">Missing</th></tr>
+                    </thead>
+                    <tbody>${missing.map(renderMissingRow).join("")}</tbody>
+                </table>
+              </details>`
+            : "",
+    ].join("");
+
+    container.innerHTML = html;
+}
+
+function renderRecipeRow(r) {
+    const profitClass = r.profit_gold > 0 ? "profit-pos" : (r.profit_gold < 0 ? "profit-neg" : "");
+    const marginPct = r.margin_pct !== null ? `${(r.margin_pct * 100).toFixed(0)}%` : "—";
+    const procBadge = r.mastery_applies
+        ? `<span class="proc-badge" title="Mastery gives avg ${r.effective_output_qty.toFixed(2)} per craft">+20%</span>`
+        : "";
+    const outputIcon = r.output_icon_url
+        ? `<img class="recipe-icon" src="${r.output_icon_url}" alt="" loading="lazy" onerror="this.style.display='none'">`
+        : "";
+    const inputsHtml = r.inputs.map(inp => {
+        const icon = inp.icon_url
+            ? `<img class="input-icon" src="${inp.icon_url}" alt="" loading="lazy" onerror="this.style.display='none'">`
+            : "";
+        const cost = inp.line_cost_gold !== null ? formatGold(inp.line_cost_gold) : "—";
+        return `<span class="input-chip" title="${inp.name}: ${inp.qty} × ${formatGold(inp.unit_price_gold) || "?"}">
+            ${icon}<span class="input-qty">${inp.qty}×</span>
+            <span class="input-name">${inp.name}</span>
+            <span class="input-cost">${cost}</span>
+        </span>`;
+    }).join("");
+
+    return `<tr class="recipe-row ${r.mastery_applies ? "buffed" : ""}">
+        <td class="col-output">
+            <div class="recipe-output">
+                ${outputIcon}
+                <div>
+                    <div class="recipe-name">${r.name}</div>
+                    <div class="recipe-sub">
+                        ${r.effective_output_qty.toFixed(2)} × ${formatGold(r.output_unit_price_gold)} ${procBadge}
+                    </div>
+                </div>
+            </div>
+        </td>
+        <td class="col-cat"><span class="cat-pill cat-${r.mastery_category}">${r.mastery_category}</span></td>
+        <td class="col-num">${formatGold(r.input_cost_gold)}</td>
+        <td class="col-num">${formatGold(r.revenue_gold)}</td>
+        <td class="col-num ${profitClass}">${formatGold(r.profit_gold)}</td>
+        <td class="col-num ${profitClass}">${marginPct}</td>
+        <td class="col-inputs">${inputsHtml}</td>
+    </tr>`;
+}
+
+function renderMissingRow(r) {
+    const missingNames = r.inputs
+        .filter(i => i.unit_price_copper === null)
+        .map(i => `${i.qty}× ${i.name}`);
+    if (r.output_unit_price_copper === null) {
+        missingNames.unshift(`output: ${r.output_name}`);
+    }
+    return `<tr>
+        <td class="col-output"><span class="recipe-name">${r.name}</span></td>
+        <td class="col-cat"><span class="cat-pill cat-${r.mastery_category}">${r.mastery_category}</span></td>
+        <td class="col-inputs"><span class="input-missing">${missingNames.join(", ") || "unknown"}</span></td>
+    </tr>`;
 }
 
 // --- Actions ---

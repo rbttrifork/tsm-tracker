@@ -78,13 +78,14 @@ TBC_ITEMS = {
     22840: ("Elixir of Major Mageblood", "elixir", "inv_potion_151"),
     22830: ("Elixir of the Searching Eye", "elixir", "inv_potion_135"),
 
-    # Potions
+    # Potions — IDs verified via Wowhead TBC
     22832: ("Super Mana Potion", "potion", "inv_potion_137"),
     22829: ("Super Healing Potion", "potion", "inv_potion_131"),
     22839: ("Destruction Potion", "potion", "inv_potion_107"),
-    22828: ("Ironshield Potion", "potion", "inv_potion_109"),
     22838: ("Haste Potion", "potion", "inv_potion_108"),
-    22849: ("Heroic Potion", "potion", "inv_potion_133"),
+    22837: ("Heroic Potion", "potion", "inv_potion_133"),
+    22849: ("Ironshield Potion", "potion", "inv_potion_109"),
+    22828: ("Insane Strength Potion", "potion", "inv_potion_71"),
 
     # Food Buffs
     33052: ("Fisherman's Feast", "food", "inv_misc_food_88_ravagernuggets"),
@@ -179,7 +180,7 @@ TBC_ITEMS = {
     22447: ("Lesser Planar Essence", "enchanting", "inv_enchant_essencearcanesmall"),
     22448: ("Small Prismatic Shard", "enchanting", "inv_enchant_shardprismaticsmall"),
 
-    # Herbs
+    # Herbs — TBC
     22785: ("Felweed", "herb", "inv_misc_herb_felweed"),
     22786: ("Dreaming Glory", "herb", "inv_misc_herb_dreamingglory"),
     22787: ("Ragveil", "herb", "inv_misc_herb_ragveil"),
@@ -190,6 +191,11 @@ TBC_ITEMS = {
     22792: ("Nightmare Vine", "herb", "inv_misc_herb_nightmarevine"),
     22793: ("Mana Thistle", "herb", "inv_misc_herb_manathistle"),
     22794: ("Fel Lotus", "herb", "inv_misc_herb_fellotus"),
+
+    # Herbs — Classic (still used in TBC recipes)
+    13463: ("Dreamfoil", "herb", "inv_misc_herb_dreamfoil"),
+    13464: ("Golden Sansam", "herb", "inv_misc_herb_goldensansam"),
+    13465: ("Mountain Silversage", "herb", "inv_misc_herb_mountainsilversage"),
 
     # Ores & Bars
     23424: ("Fel Iron Ore", "ore", "inv_ore_feliron"),

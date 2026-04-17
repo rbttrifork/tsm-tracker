@@ -7,6 +7,7 @@ from db import init_db, get_db, populate_items, insert_price_snapshots_bulk, ins
 from config import TBC_ITEMS, CATEGORIES, RAID_DAYS, DEPLOYMENT_MODE, PUSH_API_KEY
 from tsm_parser import copper_to_gold_float
 from analyzer import get_recommendations, get_sell_recommendations, get_market_summary, get_market_movers, get_day_of_week_averages
+from professions import analyze_alchemy
 
 # Only import collector in local mode (it needs AppData.lua access)
 if DEPLOYMENT_MODE == "local":
@@ -246,6 +247,25 @@ def api_trades(item_id):
         "name": item["name"] if item else f"Item {item_id}",
         "trades": data,
     })
+
+
+@app.route("/api/professions/alchemy")
+def api_professions_alchemy():
+    """Alchemy crafting profitability.
+
+    Query params:
+      mastery = none|potion|elixir|transmute  (default: none)
+    """
+    mastery = request.args.get("mastery", "none").lower()
+    results = analyze_alchemy(mastery)
+    # Attach Wowhead icon URLs for convenience
+    for r in results:
+        if r.get("output_icon"):
+            r["output_icon_url"] = f"https://wow.zamimg.com/images/wow/icons/large/{r['output_icon']}.jpg"
+        for inp in r["inputs"]:
+            if inp.get("icon"):
+                inp["icon_url"] = f"https://wow.zamimg.com/images/wow/icons/large/{inp['icon']}.jpg"
+    return jsonify({"mastery": mastery, "recipes": results})
 
 
 @app.route("/api/snapshot", methods=["POST"])

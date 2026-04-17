@@ -3,29 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TSM Price Tracker - Spineshatter</title>
+    <title>TSM Price Tracker — Spineshatter</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital,wght@0,400;1,400&family=Cinzel:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3"></script>
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <header>
-        <div class="header-left">
-            <h1>TSM Price Tracker</h1>
-            <span class="realm">Spineshatter - Horde (EU-Fresh)</span>
+    <div class="page-frame">
+
+    <header class="site-header">
+        <div class="brand">
+            <span class="brand-mark">TSM</span>
+            <div class="brand-titles">
+                <h1 class="brand-title"><em>The Price Tracker</em></h1>
+                <p class="brand-sub"><span>Spineshatter</span> &middot; <span>Horde</span> &middot; <span>EU&nbsp;Fresh</span></p>
+            </div>
         </div>
-        <div class="header-right">
+        <div class="header-meta">
             {% if deployment_mode == 'local' %}
-            <button id="btn-collect" onclick="collectSnapshot()">Collect Snapshot</button>
+            <button id="btn-collect" class="btn-ghost" onclick="collectSnapshot()">
+                <span class="btn-dot"></span>Collect Snapshot
+            </button>
             {% endif %}
-            <span id="stats-info"></span>
+            <span id="stats-info" class="meta-stats"></span>
         </div>
     </header>
 
-    <!-- Market Pulse -->
-    <div id="market-pulse" class="market-pulse">
+    <nav class="top-tabs" role="tablist">
+        <button class="top-tab active" data-view="market" onclick="switchView('market')">
+            <span class="tab-label">The Market</span>
+        </button>
+        <span class="top-tab-divider" aria-hidden="true">&#9670;</span>
+        <button class="top-tab" data-view="professions" onclick="switchView('professions')">
+            <span class="tab-label">Professions</span>
+        </button>
+    </nav>
+
+    <!-- Market Tide -->
+    <div id="market-pulse" class="market-pulse view view-market">
         <div class="pulse-content">
-            <span class="pulse-label">Market Pulse</span>
+            <span class="pulse-label">Market Tide</span>
             <div class="pulse-stats">
                 <span class="pulse-above" id="pulse-above"></span>
                 <span class="pulse-normal" id="pulse-normal"></span>
@@ -35,31 +55,41 @@
         </div>
     </div>
 
-    <main>
-        <!-- Side-by-side Recommendations -->
-        <div class="recommendations-grid">
-            <section class="rec-panel">
-                <h2 class="section-title buy-title">Buy Low</h2>
-                <div id="recommendations-list"></div>
-            </section>
-            <section class="rec-panel">
-                <h2 class="section-title sell-title">Sell High</h2>
-                <div id="sell-recommendations-list"></div>
-            </section>
-        </div>
+    <main class="view view-market">
+        <section class="rec-wrap">
+            <div class="section-head">
+                <span class="numeral">I</span>
+                <h2 class="section-title">Opportunities</h2>
+                <span class="section-rule"></span>
+            </div>
+            <div class="recommendations-grid">
+                <section class="rec-panel" data-side="buy">
+                    <h3 class="rec-sub">Buy Low</h3>
+                    <div id="recommendations-list"></div>
+                </section>
+                <section class="rec-panel" data-side="sell">
+                    <h3 class="rec-sub">Sell High</h3>
+                    <div id="sell-recommendations-list"></div>
+                </section>
+            </div>
+        </section>
 
-        <!-- Market Movers -->
         <section class="market-movers">
-            <h2 class="section-title movers-title">Market Movers</h2>
+            <div class="section-head">
+                <span class="numeral">II</span>
+                <h2 class="section-title">Market Movers</h2>
+                <span class="section-rule"></span>
+            </div>
             <div class="movers-grid" id="movers-grid"></div>
         </section>
 
-        <!-- All Items (collapsible) -->
         <section id="items-section">
-            <h2 class="section-title items-title collapsible" onclick="toggleItems()">
-                <span id="items-toggle-arrow">&#9660;</span>
-                All Items <span id="items-count" class="section-count"></span>
-            </h2>
+            <div class="section-head collapsible" onclick="toggleItems()">
+                <span class="numeral">III</span>
+                <h2 class="section-title">The Ledger <span id="items-count" class="section-count"></span></h2>
+                <span class="section-rule"></span>
+                <span id="items-toggle-arrow" class="caret">&#9660;</span>
+            </div>
             <div id="items-collapsible">
                 <div class="category-tabs">
                     <button class="tab active" data-category="all" onclick="filterCategory('all')">All</button>
@@ -70,32 +100,59 @@
                 <div id="item-grid"></div>
             </div>
         </section>
+    </main>
 
-        <!-- Price Chart Modal -->
-        <div id="chart-modal" class="modal hidden">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2 id="chart-title">Item Price History</h2>
-                    <div class="chart-controls">
-                        <select id="chart-days" onchange="reloadChart()">
-                            <option value="7">7 days</option>
-                            <option value="14">14 days</option>
-                            <option value="30" selected>30 days</option>
-                            <option value="60">60 days</option>
-                        </select>
-                        <button class="close-btn" onclick="closeChart()">&times;</button>
-                    </div>
+    <main class="view view-professions hidden">
+        <section class="professions-section">
+            <div class="section-head">
+                <span class="numeral">§</span>
+                <h2 class="section-title">The Atelier</h2>
+                <span class="section-rule"></span>
+            </div>
+            <div class="professions-header">
+                <div class="profession-tabs">
+                    <button class="prof-tab active" data-prof="alchemy">Alchemy</button>
                 </div>
-                <div class="chart-container">
-                    <canvas id="price-chart"></canvas>
-                </div>
-                <div id="dow-chart-container">
-                    <h3>Average Price by Day of Week</h3>
-                    <canvas id="dow-chart"></canvas>
+                <div class="mastery-picker">
+                    <label for="alchemy-mastery">Mastery</label>
+                    <select id="alchemy-mastery" onchange="loadAlchemy()">
+                        <option value="none">None</option>
+                        <option value="potion">Potion Mastery &mdash; +20% potions</option>
+                        <option value="elixir">Elixir Mastery &mdash; +20% elixirs &amp; flasks</option>
+                        <option value="transmute">Transmute Mastery &mdash; +20% transmutes</option>
+                    </select>
                 </div>
             </div>
-        </div>
+            <div id="alchemy-recipes"></div>
+        </section>
     </main>
+
+    <!-- Price Chart Modal -->
+    <div id="chart-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="chart-title">Item Price History</h2>
+                <div class="chart-controls">
+                    <select id="chart-days" onchange="reloadChart()">
+                        <option value="7">7 days</option>
+                        <option value="14">14 days</option>
+                        <option value="30" selected>30 days</option>
+                        <option value="60">60 days</option>
+                    </select>
+                    <button class="close-btn" onclick="closeChart()">&times;</button>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="price-chart"></canvas>
+            </div>
+            <div id="dow-chart-container">
+                <h3>Average Price by Day of Week</h3>
+                <canvas id="dow-chart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    </div><!-- /page-frame -->
 
     <script src="/static/app.js"></script>
     <script>
