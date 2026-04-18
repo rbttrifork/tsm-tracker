@@ -260,9 +260,9 @@ TBC_ITEMS = {
     27503: ("Scroll of Strength V", "scroll", "inv_scroll_02"),
 
     # Misc Crafting — IDs verified via Wowhead TBC
-    23571: ("Primal Might", "other", "inv_elemental_primal_nether"),
-    23572: ("Primal Nether", "other", "spell_nature_lightningoverload"),
-    30183: ("Nether Vortex", "other", "inv_elemental_primal_nether"),
+    23571: ("Primal Might", "other", "spell_nature_lightningoverload"),
+    23572: ("Primal Nether", "other", "inv_elemental_primal_nether"),
+    30183: ("Nether Vortex", "other", "spell_arcane_rune"),
 
     # Vendor-bought crafting reagents (priced via VENDOR_PRICES, not AH)
     18256: ("Imbued Vial", "other", "inv_drink_20"),
