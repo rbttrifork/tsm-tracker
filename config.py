@@ -235,6 +235,9 @@ TBC_ITEMS = {
     # Misc Crafting
     23571: ("Primal Nether", "other", "spell_nature_lightningoverload"),
     23572: ("Nether Vortex", "other", "inv_elemental_primal_nether"),
+
+    # Vials (vendor-bought — priced via VENDOR_PRICES, not AH)
+    18256: ("Imbued Vial", "other", "inv_drink_20"),
 }
 
 # All categories for UI filtering

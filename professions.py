@@ -8,14 +8,21 @@ Mastery rules (TBC):
   - Transmute Master: ~20% proc for +1 on Transmute crafts.
   A proc averages out to a 1.20x output multiplier over many crafts.
 
-Recipes below are TBC Alchemy recipes. Vial costs are intentionally
-excluded (vendor-bought, trivial relative to herb cost). Recipe
-quantities are best-effort and can be edited freely here.
+Recipes are TBC Alchemy recipes verified against warcraft.wiki.gg /
+wowpedia / Wowhead TBC. Imbued Vial is a vendor-bought reagent; its
+cost is sourced from VENDOR_PRICES below, never from the AH.
 """
 
 from db import get_db
 from tsm_parser import copper_to_gold_float
 from config import TBC_ITEMS
+
+
+# Items that are always vendor-bought — bypass AH price lookup.
+# Values are copper. (Imbued Vial: 40 silver at alchemy supply vendors.)
+VENDOR_PRICES = {
+    18256: 4000,   # Imbued Vial — 40s
+}
 
 
 # Mastery categories a recipe can belong to
@@ -44,7 +51,7 @@ ALCHEMY_RECIPES = [
         "output_id": 22829,
         "output_qty": 1,
         "mastery_category": "potion",
-        "inputs": [(22791, 2), (22785, 1)],  # 2 Netherbloom, 1 Felweed
+        "inputs": [(22791, 2), (22785, 1), (18256, 1)],  # 2 Netherbloom, 1 Felweed, 1 Imbued Vial
     },
     {
         "id": "super_mana_potion",
@@ -52,7 +59,7 @@ ALCHEMY_RECIPES = [
         "output_id": 22832,
         "output_qty": 1,
         "mastery_category": "potion",
-        "inputs": [(22786, 2), (22785, 1)],  # 2 Dreaming Glory, 1 Felweed
+        "inputs": [(22786, 2), (22785, 1), (18256, 1)],  # 2 Dreaming Glory, 1 Felweed, 1 Imbued Vial
     },
     {
         "id": "destruction_potion",
@@ -60,7 +67,7 @@ ALCHEMY_RECIPES = [
         "output_id": 22839,
         "output_qty": 1,
         "mastery_category": "potion",
-        "inputs": [(22792, 2), (22791, 1)],  # 2 Nightmare Vine, 1 Netherbloom
+        "inputs": [(22792, 2), (22791, 1), (18256, 1)],  # 2 Nightmare Vine, 1 Netherbloom, 1 Imbued Vial
     },
     {
         "id": "haste_potion",
@@ -68,7 +75,7 @@ ALCHEMY_RECIPES = [
         "output_id": 22838,
         "output_qty": 1,
         "mastery_category": "potion",
-        "inputs": [(22789, 2), (22791, 1)],  # 2 Terocone, 1 Netherbloom
+        "inputs": [(22789, 2), (22791, 1), (18256, 1)],  # 2 Terocone, 1 Netherbloom, 1 Imbued Vial
     },
     {
         "id": "heroic_potion",
@@ -76,7 +83,7 @@ ALCHEMY_RECIPES = [
         "output_id": 22837,  # Wowhead-correct ID (was 22849 prior to audit)
         "output_qty": 1,
         "mastery_category": "potion",
-        "inputs": [(22789, 2), (22790, 1)],  # 2 Terocone, 1 Ancient Lichen
+        "inputs": [(22789, 2), (22790, 1), (18256, 1)],  # 2 Terocone, 1 Ancient Lichen, 1 Imbued Vial
     },
     {
         "id": "ironshield_potion",
@@ -84,7 +91,7 @@ ALCHEMY_RECIPES = [
         "output_id": 22849,  # Wowhead-correct ID (was 22828 prior to audit)
         "output_qty": 1,
         "mastery_category": "potion",
-        "inputs": [(22790, 2), (22573, 3)],  # 2 Ancient Lichen, 3 Mote of Earth
+        "inputs": [(22790, 2), (22573, 3), (18256, 1)],  # 2 Ancient Lichen, 3 Mote of Earth, 1 Imbued Vial
     },
 
     # --- Elixirs (Elixir Mastery) ---
@@ -94,7 +101,7 @@ ALCHEMY_RECIPES = [
         "output_id": 22831,
         "output_qty": 1,
         "mastery_category": "elixir",
-        "inputs": [(22789, 1), (22785, 2)],  # 1 Terocone, 2 Felweed
+        "inputs": [(22789, 1), (22785, 2), (18256, 1)],  # 1 Terocone, 2 Felweed, 1 Imbued Vial
     },
     {
         "id": "elixir_major_strength",
@@ -102,7 +109,7 @@ ALCHEMY_RECIPES = [
         "output_id": 22824,
         "output_qty": 1,
         "mastery_category": "elixir",
-        "inputs": [(13465, 1), (22785, 1)],  # 1 Mountain Silversage, 1 Felweed
+        "inputs": [(13465, 1), (22785, 1), (18256, 1)],  # 1 Mountain Silversage, 1 Felweed, 1 Imbued Vial
     },
     {
         "id": "elixir_major_firepower",
@@ -110,7 +117,7 @@ ALCHEMY_RECIPES = [
         "output_id": 22833,
         "output_qty": 1,
         "mastery_category": "elixir",
-        "inputs": [(22574, 2), (22790, 1)],  # 2 Mote of Fire, 1 Ancient Lichen
+        "inputs": [(22574, 2), (22790, 1), (18256, 1)],  # 2 Mote of Fire, 1 Ancient Lichen, 1 Imbued Vial
     },
     {
         "id": "elixir_major_shadow_power",
@@ -118,7 +125,7 @@ ALCHEMY_RECIPES = [
         "output_id": 22835,
         "output_qty": 1,
         "mastery_category": "elixir",
-        "inputs": [(22790, 1), (22792, 1)],  # 1 Ancient Lichen, 1 Nightmare Vine
+        "inputs": [(22790, 1), (22792, 1), (18256, 1)],  # 1 Ancient Lichen, 1 Nightmare Vine, 1 Imbued Vial
     },
     {
         "id": "elixir_major_frost_power",
@@ -126,7 +133,7 @@ ALCHEMY_RECIPES = [
         "output_id": 22827,
         "output_qty": 1,
         "mastery_category": "elixir",
-        "inputs": [(22578, 2), (22790, 1)],  # 2 Mote of Water, 1 Ancient Lichen
+        "inputs": [(22578, 2), (22790, 1), (18256, 1)],  # 2 Mote of Water, 1 Ancient Lichen, 1 Imbued Vial
     },
     {
         "id": "adepts_elixir",
@@ -134,7 +141,7 @@ ALCHEMY_RECIPES = [
         "output_id": 28103,
         "output_qty": 1,
         "mastery_category": "elixir",
-        "inputs": [(13463, 1), (22785, 1)],  # 1 Dreamfoil, 1 Felweed
+        "inputs": [(13463, 1), (22785, 1), (18256, 1)],  # 1 Dreamfoil, 1 Felweed, 1 Imbued Vial
     },
     {
         "id": "elixir_major_mageblood",
@@ -142,7 +149,7 @@ ALCHEMY_RECIPES = [
         "output_id": 22840,
         "output_qty": 1,
         "mastery_category": "elixir",
-        "inputs": [(22790, 1), (22791, 1)],  # 1 Ancient Lichen, 1 Netherbloom
+        "inputs": [(22790, 1), (22791, 1), (18256, 1)],  # 1 Ancient Lichen, 1 Netherbloom, 1 Imbued Vial
     },
     {
         "id": "elixir_major_defense",
@@ -150,7 +157,7 @@ ALCHEMY_RECIPES = [
         "output_id": 22834,
         "output_qty": 1,
         "mastery_category": "elixir",
-        "inputs": [(22790, 3), (22789, 1)],  # 3 Ancient Lichen, 1 Terocone
+        "inputs": [(22790, 3), (22789, 1), (18256, 1)],  # 3 Ancient Lichen, 1 Terocone, 1 Imbued Vial
     },
     {
         "id": "elixir_major_fortitude",
@@ -158,7 +165,7 @@ ALCHEMY_RECIPES = [
         "output_id": 32062,
         "output_qty": 1,
         "mastery_category": "elixir",
-        "inputs": [(22787, 2), (22785, 1)],  # 2 Ragveil, 1 Felweed
+        "inputs": [(22787, 2), (22785, 1), (18256, 1)],  # 2 Ragveil, 1 Felweed, 1 Imbued Vial
     },
     {
         "id": "elixir_draenic_wisdom",
@@ -166,7 +173,7 @@ ALCHEMY_RECIPES = [
         "output_id": 32067,
         "output_qty": 1,
         "mastery_category": "elixir",
-        "inputs": [(22785, 1), (22789, 1)],  # 1 Felweed, 1 Terocone
+        "inputs": [(22785, 1), (22789, 1), (18256, 1)],  # 1 Felweed, 1 Terocone, 1 Imbued Vial
     },
     {
         "id": "elixir_ironskin",
@@ -174,7 +181,7 @@ ALCHEMY_RECIPES = [
         "output_id": 32068,
         "output_qty": 1,
         "mastery_category": "elixir",
-        "inputs": [(22790, 1), (22787, 1)],  # 1 Ancient Lichen, 1 Ragveil
+        "inputs": [(22790, 1), (22787, 1), (18256, 1)],  # 1 Ancient Lichen, 1 Ragveil, 1 Imbued Vial
     },
 
     # --- Flasks (Elixir Mastery) ---
@@ -185,7 +192,7 @@ ALCHEMY_RECIPES = [
         "output_id": 22861,
         "output_qty": 1,
         "mastery_category": "elixir",
-        "inputs": [(22789, 7), (22793, 3), (22794, 1)],  # 7 Terocone, 3 Mana Thistle, 1 Fel Lotus
+        "inputs": [(22789, 7), (22793, 3), (22794, 1), (18256, 1)],  # 7 Terocone, 3 Mana Thistle, 1 Fel Lotus, 1 Imbued Vial
     },
     {
         "id": "flask_mighty_restoration",
@@ -193,7 +200,7 @@ ALCHEMY_RECIPES = [
         "output_id": 22853,
         "output_qty": 1,
         "mastery_category": "elixir",
-        "inputs": [(22786, 7), (22793, 3), (22794, 1)],  # 7 Dreaming Glory, 3 Mana Thistle, 1 Fel Lotus
+        "inputs": [(22786, 7), (22793, 3), (22794, 1), (18256, 1)],  # 7 Dreaming Glory, 3 Mana Thistle, 1 Fel Lotus, 1 Imbued Vial
     },
     {
         "id": "flask_pure_death",
@@ -201,7 +208,7 @@ ALCHEMY_RECIPES = [
         "output_id": 22866,
         "output_qty": 1,
         "mastery_category": "elixir",
-        "inputs": [(22792, 7), (22793, 3), (22794, 1)],  # 7 Nightmare Vine, 3 Mana Thistle, 1 Fel Lotus
+        "inputs": [(22792, 7), (22793, 3), (22794, 1), (18256, 1)],  # 7 Nightmare Vine, 3 Mana Thistle, 1 Fel Lotus, 1 Imbued Vial
     },
     {
         "id": "flask_blinding_light",
@@ -209,13 +216,15 @@ ALCHEMY_RECIPES = [
         "output_id": 22854,
         "output_qty": 1,
         "mastery_category": "elixir",
-        "inputs": [(22791, 7), (22793, 3), (22794, 1)],  # 7 Netherbloom, 3 Mana Thistle, 1 Fel Lotus
+        "inputs": [(22791, 7), (22793, 3), (22794, 1), (18256, 1)],  # 7 Netherbloom, 3 Mana Thistle, 1 Fel Lotus, 1 Imbued Vial
     },
 ]
 
 
 def _latest_price(conn, item_id):
-    """Return (copper_price, source) using market_value, falling back to min_buyout."""
+    """Return (copper_price, source). Vendor-priced items bypass the AH lookup."""
+    if item_id in VENDOR_PRICES:
+        return VENDOR_PRICES[item_id], "vendor"
     row = conn.execute(
         """SELECT market_value, min_buyout
            FROM price_snapshots
