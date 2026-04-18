@@ -659,7 +659,7 @@ function switchProfession(profession) {
     // Mastery picker only shown for Alchemy
     const picker = document.getElementById("mastery-picker");
     if (picker) {
-        picker.style.display = profession === "alchemy" ? "" : "none";
+        picker.style.visibility = profession === "alchemy" ? "" : "hidden";
     }
 
     // Reset sort to default per-profession: alchemy defaults to profit, others too
@@ -674,7 +674,7 @@ function syncProfessionTabs() {
     });
     const picker = document.getElementById("mastery-picker");
     if (picker) {
-        picker.style.display = currentProfession === "alchemy" ? "" : "none";
+        picker.style.visibility = currentProfession === "alchemy" ? "" : "hidden";
     }
 }
 
