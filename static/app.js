@@ -153,7 +153,7 @@ function renderRecommendations(recs) {
 
     const INITIAL_SHOW = 5;
     const renderBuyCard = r => {
-        const profitGold = (r.avg_raid_day_gold || r.avg_7d_gold) - r.current_min_buyout_gold;
+        const profitGold = r.profit_gold;
         return `
         <div class="compact-card buy ${r.signal}" onclick="openChart(${r.item_id})">
             ${r.icon_url ? `<img class="card-icon" src="${r.icon_url}" alt="" loading="lazy" onerror="this.style.display='none'">` : ''}
@@ -203,7 +203,7 @@ function renderSellRecommendations(recs) {
 
     const INITIAL_SHOW = 5;
     const renderSellCard = r => {
-        const premiumGold = r.current_min_buyout_gold - (r.avg_7d_gold || 0);
+        const premiumGold = r.profit_gold;
         return `
         <div class="compact-card sell ${r.signal}" onclick="openChart(${r.item_id})">
             ${r.icon_url ? `<img class="card-icon" src="${r.icon_url}" alt="" loading="lazy" onerror="this.style.display='none'">` : ''}

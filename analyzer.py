@@ -132,6 +132,10 @@ def get_recommendations():
         else:
             signal = "hold"
 
+        # Absolute gold gain if we buy now at minBuyout and resell at the reference average.
+        reference_price = avg_raid_day if avg_raid_day and avg_raid_day > avg_7d else avg_7d
+        profit_copper = reference_price - current_price
+
         recommendations.append({
             "item_id": item_id,
             "name": item["name"],
@@ -143,6 +147,7 @@ def get_recommendations():
             "avg_off_day_price": avg_off_day,
             "discount_pct": discount_pct,
             "expected_profit_pct": expected_profit_pct,
+            "profit_copper": profit_copper,
             "confidence": confidence,
             "signal": signal,
             "num_auctions": current_auctions,
@@ -150,9 +155,9 @@ def get_recommendations():
 
     conn.close()
 
-    # Sort: strong_buy first, then buy, then hold; within each group by expected profit
+    # Sort: strong_buy first, then buy, then hold; within each group by absolute profit (gold).
     signal_order = {"strong_buy": 0, "buy": 1, "hold": 2}
-    recommendations.sort(key=lambda r: (signal_order.get(r["signal"], 3), -r["expected_profit_pct"]))
+    recommendations.sort(key=lambda r: (signal_order.get(r["signal"], 3), -r["profit_copper"]))
 
     return recommendations
 
@@ -237,6 +242,9 @@ def get_sell_recommendations():
         else:
             signal = "hold"
 
+        # Absolute gold premium over the rolling 7-day average.
+        profit_copper = current_price - avg_7d
+
         recommendations.append({
             "item_id": item_id,
             "name": item["name"],
@@ -246,6 +254,7 @@ def get_sell_recommendations():
             "avg_raid_day_price": avg_raid_day,
             "avg_off_day_price": avg_off_day,
             "premium_pct": premium_pct,
+            "profit_copper": profit_copper,
             "signal": signal,
             "num_auctions": current_auctions,
         })
@@ -253,7 +262,7 @@ def get_sell_recommendations():
     conn.close()
 
     signal_order = {"strong_sell": 0, "sell": 1, "hold": 2}
-    recommendations.sort(key=lambda r: (signal_order.get(r["signal"], 3), -r["premium_pct"]))
+    recommendations.sort(key=lambda r: (signal_order.get(r["signal"], 3), -r["profit_copper"]))
 
     return recommendations
 

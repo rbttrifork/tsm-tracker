@@ -153,6 +153,7 @@ def api_recommendations():
         r["avg_14d_gold"] = copper_to_gold_float(r["avg_14d"])
         r["avg_raid_day_gold"] = copper_to_gold_float(r["avg_raid_day_price"])
         r["avg_off_day_gold"] = copper_to_gold_float(r["avg_off_day_price"])
+        r["profit_gold"] = copper_to_gold_float(r["profit_copper"])
         r["icon_url"] = get_icon_url(r["item_id"])
     return jsonify(recs)
 
@@ -166,6 +167,7 @@ def api_sell_recommendations():
         r["avg_7d_gold"] = copper_to_gold_float(r["avg_7d"])
         r["avg_raid_day_gold"] = copper_to_gold_float(r["avg_raid_day_price"])
         r["avg_off_day_gold"] = copper_to_gold_float(r["avg_off_day_price"])
+        r["profit_gold"] = copper_to_gold_float(r["profit_copper"])
         r["icon_url"] = get_icon_url(r["item_id"])
     return jsonify(recs)
 
