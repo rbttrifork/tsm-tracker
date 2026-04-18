@@ -83,13 +83,13 @@ ALCHEMY_RECIPES = [
      "inputs": [(22790, 1), (22787, 1), (18256, 1)]},
 
     # --- Flasks (Elixir Mastery) — all share: 7 primary herb + 3 Mana Thistle + 1 Fel Lotus + 1 Imbued Vial ---
-    {"id": "flask_relentless_assault",  "name": "Flask of Relentless Assault",  "output_id": 22861, "output_qty": 1, "mastery_category": "elixir",
+    {"id": "flask_relentless_assault",  "name": "Flask of Relentless Assault",  "output_id": 22854, "output_qty": 1, "mastery_category": "elixir",
      "inputs": [(22789, 7), (22793, 3), (22794, 1), (18256, 1)]},
     {"id": "flask_mighty_restoration",  "name": "Flask of Mighty Restoration",  "output_id": 22853, "output_qty": 1, "mastery_category": "elixir",
      "inputs": [(22786, 7), (22793, 3), (22794, 1), (18256, 1)]},
     {"id": "flask_pure_death",          "name": "Flask of Pure Death",          "output_id": 22866, "output_qty": 1, "mastery_category": "elixir",
      "inputs": [(22792, 7), (22793, 3), (22794, 1), (18256, 1)]},
-    {"id": "flask_blinding_light",      "name": "Flask of Blinding Light",      "output_id": 22854, "output_qty": 1, "mastery_category": "elixir",
+    {"id": "flask_blinding_light",      "name": "Flask of Blinding Light",      "output_id": 22861, "output_qty": 1, "mastery_category": "elixir",
      "inputs": [(22791, 7), (22793, 3), (22794, 1), (18256, 1)]},
 ]
 
