@@ -138,9 +138,9 @@ TAILORING_RECIPES = [
 
     # --- Spellstrike set (Cloth, Spellfire spec material input) ---
     {"id": "spellstrike_hood",      "name": "Spellstrike Hood",      "output_id": 24266, "output_qty": 1, "mastery_category": "spellstrike",
-     "inputs": [(24272, 10), (23571, 5), (23572, 1)]},                                      # 10 Spellcloth, 5 Primal Might, 1 Primal Nether
+     "inputs": [(24271, 10), (23571, 5), (23572, 1)]},                                      # 10 Spellcloth (id 24271), 5 Primal Might, 1 Primal Nether
     {"id": "spellstrike_pants",     "name": "Spellstrike Pants",     "output_id": 24267, "output_qty": 1, "mastery_category": "spellstrike",
-     "inputs": [(24272, 10), (23571, 5), (23572, 1)]},                                      # 10 Spellcloth, 5 Primal Might, 1 Primal Nether
+     "inputs": [(24271, 10), (23571, 5), (23572, 1)]},                                      # 10 Spellcloth (id 24271), 5 Primal Might, 1 Primal Nether
 
     # --- Whitemend set (Cloth, Mooncloth material input) ---
     {"id": "whitemend_hood",        "name": "Whitemend Hood",        "output_id": 24264, "output_qty": 1, "mastery_category": "whitemend",
