@@ -7,7 +7,7 @@ from db import init_db, get_db, populate_items, insert_price_snapshots_bulk, ins
 from config import TBC_ITEMS, CATEGORIES, RAID_DAYS, DEPLOYMENT_MODE, PUSH_API_KEY
 from tsm_parser import copper_to_gold_float
 from analyzer import get_recommendations, get_sell_recommendations, get_market_summary, get_market_movers, get_day_of_week_averages
-from professions import analyze_alchemy
+from professions import analyze_profession, PROFESSION_RECIPES, MASTERY_BY_PROFESSION
 
 # Only import collector in local mode (it needs AppData.lua access)
 if DEPLOYMENT_MODE == "local":
@@ -249,15 +249,19 @@ def api_trades(item_id):
     })
 
 
-@app.route("/api/professions/alchemy")
-def api_professions_alchemy():
-    """Alchemy crafting profitability.
+@app.route("/api/professions/<profession>")
+def api_professions(profession):
+    """Crafting profitability for a given profession.
 
     Query params:
-      mastery = none|potion|elixir|transmute  (default: none)
+      mastery = <profession-specific mastery option>  (default: none)
     """
+    profession = profession.lower()
+    if profession not in PROFESSION_RECIPES:
+        return jsonify({"error": f"Unknown profession '{profession}'"}), 404
+
     mastery = request.args.get("mastery", "none").lower()
-    results = analyze_alchemy(mastery)
+    results = analyze_profession(profession, mastery)
     # Attach Wowhead icon URLs for convenience
     for r in results:
         if r.get("output_icon"):
@@ -265,7 +269,14 @@ def api_professions_alchemy():
         for inp in r["inputs"]:
             if inp.get("icon"):
                 inp["icon_url"] = f"https://wow.zamimg.com/images/wow/icons/large/{inp['icon']}.jpg"
-    return jsonify({"mastery": mastery, "recipes": results})
+
+    mastery_options = sorted(MASTERY_BY_PROFESSION.get(profession, {"none": set()}).keys())
+    return jsonify({
+        "profession": profession,
+        "mastery": mastery,
+        "mastery_options": mastery_options,
+        "recipes": results,
+    })
 
 
 @app.route("/api/snapshot", methods=["POST"])

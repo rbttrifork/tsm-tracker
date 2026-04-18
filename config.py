@@ -214,9 +214,36 @@ TBC_ITEMS = {
     21845: ("Primal Mooncloth", "cloth", "inv_fabric_moonrag_primal"),
     21844: ("Bolt of Soulcloth", "cloth", "inv_fabric_soulcloth_bolt"),
     21840: ("Bolt of Netherweave", "cloth", "inv_fabric_netherweave_bolt"),
+    24272: ("Spellcloth", "cloth", "inv_fabric_felrag"),
     21887: ("Knothide Leather", "leather", "inv_misc_leatherscrap_10"),
     23793: ("Heavy Knothide Leather", "leather", "inv_misc_leatherscrap_11"),
     29548: ("Nether Dragonscales", "leather", "inv_misc_monsterscales_10"),
+    25708: ("Thick Clefthoof Leather", "leather", "inv_misc_leatherscrap_09"),
+    25707: ("Fel Hide", "leather", "inv_misc_pelt_wolf_ruin_04"),
+    29539: ("Cobra Scales", "leather", "inv_misc_monsterscales_17"),
+    25699: ("Crystal Infused Leather", "leather", "inv_misc_leatherscrap_08"),
+
+    # Crafted leatherworking goods
+    29534: ("Clefthide Leg Armor", "leatherworking", "inv_misc_armorkit_22"),
+    29533: ("Cobrahide Leg Armor", "leatherworking", "inv_misc_armorkit_19"),
+    29535: ("Nethercobra Leg Armor", "leatherworking", "inv_misc_armorkit_21"),
+    29536: ("Nethercleft Leg Armor", "leatherworking", "inv_misc_armorkit_18"),
+    25684: ("Fel Leather Gloves", "leatherworking", "inv_gauntlets_25"),
+    25685: ("Fel Leather Leggings", "leatherworking", "inv_pants_leather_09"),
+    25686: ("Fel Leather Boots", "leatherworking", "inv_boots_05"),
+    29521: ("Felstalker Bracers", "leatherworking", "inv_bracer_13"),
+    29520: ("Felstalker Breastplate", "leatherworking", "inv_chest_leather_08"),
+    29519: ("Felstalker Belt", "leatherworking", "inv_belt_27"),
+
+    # Crafted tailoring goods
+    24266: ("Spellstrike Hood", "tailoring", "inv_helmet_86"),
+    24267: ("Spellstrike Pants", "tailoring", "inv_pants_cloth_10"),
+    24264: ("Whitemend Hood", "tailoring", "inv_helmet_84"),
+    24262: ("Whitemend Pants", "tailoring", "inv_pants_cloth_11"),
+    24274: ("Runic Spellthread", "tailoring", "inv_misc_gem_sapphire_02"),
+    24276: ("Golden Spellthread", "tailoring", "inv_misc_gem_topaz_02"),
+    24273: ("Mystic Spellthread", "tailoring", "inv_misc_gem_sapphire_01"),
+    24277: ("Silver Spellthread", "tailoring", "inv_misc_gem_topaz_01"),
 
     # Scrolls
     10305: ("Scroll of Protection IV", "scroll", "inv_scroll_07"),
@@ -232,12 +259,14 @@ TBC_ITEMS = {
     27502: ("Scroll of Stamina V", "scroll", "inv_scroll_07"),
     27503: ("Scroll of Strength V", "scroll", "inv_scroll_02"),
 
-    # Misc Crafting
-    23571: ("Primal Nether", "other", "spell_nature_lightningoverload"),
-    23572: ("Nether Vortex", "other", "inv_elemental_primal_nether"),
+    # Misc Crafting — IDs verified via Wowhead TBC
+    23571: ("Primal Might", "other", "inv_elemental_primal_nether"),
+    23572: ("Primal Nether", "other", "spell_nature_lightningoverload"),
+    30183: ("Nether Vortex", "other", "inv_elemental_primal_nether"),
 
-    # Vials (vendor-bought — priced via VENDOR_PRICES, not AH)
+    # Vendor-bought crafting reagents (priced via VENDOR_PRICES, not AH)
     18256: ("Imbued Vial", "other", "inv_drink_20"),
+    14341: ("Rune Thread", "other", "inv_misc_thread_01"),
 }
 
 # All categories for UI filtering
@@ -253,6 +282,8 @@ CATEGORIES = [
     ("ore", "Ores & Bars"),
     ("cloth", "Cloth"),
     ("leather", "Leather"),
+    ("leatherworking", "Leatherworking"),
+    ("tailoring", "Tailoring"),
     ("scroll", "Scrolls"),
     ("other", "Other"),
 ]

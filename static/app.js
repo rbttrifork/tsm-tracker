@@ -29,6 +29,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const sel = document.getElementById("alchemy-mastery");
         if (sel) sel.value = savedMastery;
     }
+
+    // Sync profession-tab state to the last selected profession
+    syncProfessionTabs();
 });
 
 // --- Top-level view switching ---
@@ -600,8 +603,9 @@ function renderIgnoredFooter(recs, panelId) {
         </div>`;
 }
 
-// --- Professions: Alchemy ---
+// --- Professions ---
 
+let currentProfession = localStorage.getItem("tsm_current_profession") || "alchemy";
 let lastAlchemyData = null;
 let alchemySort = { column: "profit", direction: "desc" };
 
@@ -643,16 +647,51 @@ function applyAlchemySort(recipes) {
     });
 }
 
-async function loadAlchemy() {
+function switchProfession(profession) {
+    if (currentProfession === profession) return;
+    currentProfession = profession;
+    localStorage.setItem("tsm_current_profession", profession);
+
+    document.querySelectorAll(".prof-tab").forEach(t => {
+        t.classList.toggle("active", t.dataset.prof === profession);
+    });
+
+    // Mastery picker only shown for Alchemy
+    const picker = document.getElementById("mastery-picker");
+    if (picker) {
+        picker.style.display = profession === "alchemy" ? "" : "none";
+    }
+
+    // Reset sort to default per-profession: alchemy defaults to profit, others too
+    alchemySort = { column: "profit", direction: "desc" };
+
+    loadProfession();
+}
+
+function syncProfessionTabs() {
+    document.querySelectorAll(".prof-tab").forEach(t => {
+        t.classList.toggle("active", t.dataset.prof === currentProfession);
+    });
+    const picker = document.getElementById("mastery-picker");
+    if (picker) {
+        picker.style.display = currentProfession === "alchemy" ? "" : "none";
+    }
+}
+
+async function loadProfession() {
+    syncProfessionTabs();
+
     const sel = document.getElementById("alchemy-mastery");
-    const mastery = sel ? sel.value : "none";
-    localStorage.setItem("tsm_alchemy_mastery", mastery);
+    const mastery = (currentProfession === "alchemy" && sel) ? sel.value : "none";
+    if (currentProfession === "alchemy" && sel) {
+        localStorage.setItem("tsm_alchemy_mastery", mastery);
+    }
 
     const container = document.getElementById("alchemy-recipes");
-    container.innerHTML = '<div class="no-data">Loading recipes…</div>';
+    container.innerHTML = '<div class="no-data">Consulting the ledger&hellip;</div>';
 
     try {
-        const res = await fetch(`/api/professions/alchemy?mastery=${encodeURIComponent(mastery)}`);
+        const res = await fetch(`/api/professions/${currentProfession}?mastery=${encodeURIComponent(mastery)}`);
         const data = await res.json();
         lastAlchemyData = data;
         renderAlchemy(data);
@@ -661,6 +700,9 @@ async function loadAlchemy() {
         container.innerHTML = '<div class="no-data">Failed to load recipes.</div>';
     }
 }
+
+// Backward-compat: older code paths may still call loadAlchemy()
+const loadAlchemy = loadProfession;
 
 function sortIndicatorClass(col) {
     if (alchemySort.column !== col) return "sort-indicator";

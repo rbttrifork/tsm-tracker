@@ -111,11 +111,13 @@
             </div>
             <div class="professions-header">
                 <div class="profession-tabs">
-                    <button class="prof-tab active" data-prof="alchemy">Alchemy</button>
+                    <button class="prof-tab active" data-prof="alchemy" onclick="switchProfession('alchemy')">Alchemy</button>
+                    <button class="prof-tab" data-prof="leatherworking" onclick="switchProfession('leatherworking')">Leatherworking</button>
+                    <button class="prof-tab" data-prof="tailoring" onclick="switchProfession('tailoring')">Tailoring</button>
                 </div>
-                <div class="mastery-picker">
+                <div class="mastery-picker" id="mastery-picker">
                     <label for="alchemy-mastery">Mastery</label>
-                    <select id="alchemy-mastery" onchange="loadAlchemy()">
+                    <select id="alchemy-mastery" onchange="loadProfession()">
                         <option value="none">None</option>
                         <option value="potion">Potion Mastery &mdash; +20% potions</option>
                         <option value="elixir">Elixir Mastery &mdash; +20% elixirs &amp; flasks</option>
